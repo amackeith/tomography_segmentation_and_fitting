@@ -130,9 +130,14 @@ for particle_index in lbls[1:]:
     lbl_volume_list.append([particle_index, mask_vol])
     volumes_list.append(mask_vol)
 
-plt.hist(volumes_list, bins=400)
-plt.show()
-min_vol_for_segment = int(float(input("Min Single Lent Value")))
+
+####test
+if False:
+    plt.hist(volumes_list, bins=400)
+    plt.show()
+    min_vol_for_segment = int(float(input("Min Single Lent Value")))
+
+min_vol_for_segment = 950.0
 
 for i in lbl_volume_list:
     mask_vol = i[1]
@@ -190,7 +195,7 @@ def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=F
     if type == 'bright':
         randHSVcolors = [(np.random.uniform(low=0.0, high=1),
                           np.random.uniform(low=0.2, high=1),
-                          np.random.uniform(low=0.9, high=1)) for i in xrange(nlabels)]
+                          np.random.uniform(low=0.9, high=1)) for i in range(nlabels)]
         
         # Convert HSV list to RGB
         randRGBcolors = []
@@ -211,7 +216,7 @@ def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=F
         high = 0.95
         randRGBcolors = [(np.random.uniform(low=low, high=high),
                           np.random.uniform(low=low, high=high),
-                          np.random.uniform(low=low, high=high)) for i in xrange(nlabels)]
+                          np.random.uniform(low=low, high=high)) for i in range(nlabels)]
         
         if first_color_black:
             randRGBcolors[0] = [0, 0, 0]

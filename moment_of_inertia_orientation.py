@@ -23,7 +23,7 @@ def find_principal_axis(in_arr):
 	arr = in_arr.copy()
 	com = ndi.measurements.center_of_mass(arr)
 	#com will be used as origin
-	#print "COM:",com
+	#print("COM:",com)
 
 	moment_of_inertia = np.zeros((3,3))
 
@@ -50,15 +50,15 @@ def find_principal_axis(in_arr):
 	eigen_values, eigen_vectors = np.linalg.eig(moment_of_inertia)
 
 
-	#print "EVAL", eigen_values
-	#print "EVEC\n",eigen_vectors
+	#print("EVAL", eigen_values)
+	#print("EVEC\n",eigen_vectors)
 
 
 	#ident = np.array([[1.0,0,0], [0,1.0,0], [0,0,1.0]])
 
 	#proof
-	#print "should be zero", np.linalg.det(moment_of_inertia-ident*eigen_values[0]),np.linalg.det(moment_of_inertia-ident*eigen_values[1]),np.linalg.det(moment_of_inertia-ident*eigen_values[2])
-	#print moment_of_inertia
+	#print("should be zero", np.linalg.det(moment_of_inertia-ident*eigen_values[0]),np.linalg.det(moment_of_inertia-ident*eigen_values[1]),np.linalg.det(moment_of_inertia-ident*eigen_values[2]))
+	#print(moment_of_inertia)
 	return eigen_values, eigen_vectors
 
 
@@ -249,7 +249,7 @@ for particle_index in lbls[1:]:
 
 	#mlab.contour3d(arr)
 
-	print mask_vol, "label ", particle_index, "xyz ", x_avg-50, y_avg-50, z_avg-50
+	print(mask_vol, "label ", particle_index, "xyz ", x_avg-50, y_avg-50, z_avg-50)
 	
 	mlab.pipeline.volume(mlab.pipeline.scalar_field(arr), color=(1,0,0))
 	mlab.pipeline.volume(mlab.pipeline.scalar_field(lent), color=(0,1,0))
@@ -277,7 +277,7 @@ for i in range(200):
 	com = ndi.measurements.center_of_mass(voxels)
 
 	dff = np.array([x0+padding,y0+padding,z0+padding])-com
-	print "COm diff", np.linalg.norm(dff)
+	print("COm diff", np.linalg.norm(dff))
 	val,vec = find_principal_axis(voxels)
 	index_of_max_eigen_val = np.argmax(val)
 	principle_axis = vec[:,index_of_max_eigen_val]
@@ -296,13 +296,13 @@ for i in range(200):
 
 
 	
-	#print np.around([phi-p,theta-t], decimals=5)
-	#print "error in com", dff
-	#print "Angle (degrees) between actual pi and found pi:", np.rad2deg(np.arccos(np.dot(found_pi,actual_pi)))
+	#print(np.around([phi-p,theta-t], decimals=5))
+	#print("error in com", dff)
+	#print("Angle (degrees) between actual pi and found pi:", np.rad2deg(np.arccos(np.dot(found_pi,actual_pi))))
 	if np.rad2deg(np.arccos(np.dot(found_pi,actual_pi)))>0.2:
-		print np.around([phi-p,theta-t], decimals=5), phi, p, theta, t
-		print "error in com", dff
-		print "Angle (degrees) between actual pi and found pi:", np.rad2deg(np.arccos(np.dot(found_pi,actual_pi)))
+		print(np.around([phi-p,theta-t], decimals=5), phi, p, theta, t)
+		print("error in com", dff)
+		print("Angle (degrees) between actual pi and found pi:", np.rad2deg(np.arccos(np.dot(found_pi,actual_pi))))
 
 	errors.append(np.rad2deg(np.arccos(np.dot(found_pi,actual_pi))))
 

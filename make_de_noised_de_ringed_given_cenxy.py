@@ -3,7 +3,6 @@ import tomopy
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-import nibabel as nib
 import scipy
 import dipy
 from dipy.denoise.noise_estimate import estimate_sigma
@@ -14,11 +13,11 @@ import os
 
 
 if len(sys.argv) != 3:
-	print "make_de_noised_de_ringed_given_cenxy.py passed wrong number of args"
-	print "should be: python make_de_noised_de_ringed_given_cenxy volume_file_name.npy"
+	print("make_de_noised_de_ringed_given_cenxy.py passed wrong number of args")
+	print("should be: python make_de_noised_de_ringed_given_cenxy volume_file_name.npy")
 	exit()
 elif not os.path.exists("center_of_ring.npy"):
-	print "center_of_ring.npy doesn't exists, check for issues with select center"
+	print("center_of_ring.npy doesn't exists, check for issues with select center")
 	exit()
 else:
 	fname = sys.argv[1]
@@ -26,7 +25,6 @@ else:
 	cen = np.load("center_of_ring.npy")
 	center_x = cen[0]
 	center_y = cen[1]
-
 
 #this is the volume to be denoised and deringed
 test_vol = np.load(fname)

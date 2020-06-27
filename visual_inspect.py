@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 
 
 data = np.load("safe_loc_norm_angle.npy")
-print data[33]
+print(data[33])
 
 vols= []
 for i in data[1:]:
     if i[3]<1000:
         vols.append(i[3])
-print len(vols)
+print(len(vols))
 plt.hist(vols,bins=20)
 plt.show()
 
@@ -25,7 +25,7 @@ ar = ar.flatten()
 ar = list(set(ar))
 vols = []
 for i in ar[1:200]:
-    print i
+    print(i)
     s = np.sum(arr==i)
     vols.append(s)
 
@@ -63,7 +63,7 @@ def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=F
 
 
     if type not in ('bright', 'soft'):
-        print ('Please choose "bright" or "soft" for type')
+        print(('Please choose "bright" or "soft" for type'))
         return
 
     if verbose:
@@ -127,7 +127,7 @@ original_binary_array = original_binary_array - labeled
 
 for i in range(labeled.shape[0]):
 	if i%3 ==0:
-		print i
+		print(i)
 
 		plt.figure(figsize=(20,10))
 		plt.title(i)

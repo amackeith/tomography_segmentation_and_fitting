@@ -17,7 +17,7 @@ padding = 30 #this should be determined by the size of a lentil and how much pad
 
 
 if len(sys.argv) != 2:
-	print "mom.py passed wrong number of arguments"
+	print("mom.py passed wrong number of arguments")
 	exit()
 else:
 	fname = sys.argv[1]
@@ -41,10 +41,10 @@ lbls = lbls.flatten()
 lbls = list(set(lbls))
 lbls.sort()
 
-print len(lbls)
+print(len(lbls))
 com_angle_norm_vol = []
 for particle_index in lbls[1:]:   #the first elt is the big part that is all zero
-	print particle_index
+	print(particle_index)
 	
 
 	mask = np.array((fitting==particle_index)*1)
@@ -100,8 +100,8 @@ for particle_index in lbls[1:]:   #the first elt is the big part that is all zer
 
 	#mlab.contour3d(arr)
 
-	print lentil, particle_index
-	print binary.shape, arr.shape
+	print(lentil, particle_index)
+	print(binary.shape, arr.shape)
 
 	mlab.pipeline.volume(mlab.pipeline.scalar_field(binary), color=(0,1,0))
 	mlab.pipeline.volume(mlab.pipeline.scalar_field(arr), color=(1,0,0))
@@ -111,4 +111,4 @@ for particle_index in lbls[1:]:   #the first elt is the big part that is all zer
 	
 
 np.save("%s_com_angle_vol.npy" % fname, com_angle_norm_vol)
-print "Found %s lentils" % len(com_angle_norm_vol)
+print("Found %s lentils" % len(com_angle_norm_vol))

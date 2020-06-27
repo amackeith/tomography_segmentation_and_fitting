@@ -19,8 +19,8 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 import sys
 
 if len(sys.argv) != 2:
-	print "binary_threshold_selection.py not passed the right number of args"
-	print "Should be binary_threshold_selection.py filename"
+	print("binary_threshold_selection.py not passed the right number of args")
+	print("Should be binary_threshold_selection.py filename")
 	exit()
 else:
 	fname = sys.argv[1]
@@ -81,6 +81,6 @@ example_slider.on_changed(update)
 plt.show()
 
 thresh = np.array([threshold_slider.val])
-print thresh.shape
-print thresh
+print(thresh.shape)
+print(thresh)
 np.save("%s_selected_binary_threshold.npy" % fname, thresh)

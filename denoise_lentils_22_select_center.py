@@ -9,6 +9,8 @@ if len(sys.argv) != 2:
 else:
     fname = sys.argv[1]
     arr = np.load(fname)
+    print("Loaded", fname)
+    
 
 selected_circles = []
 coords = []
@@ -17,14 +19,16 @@ finalized = False
 center_x = "Not Selected Yet"
 center_y = "Not Selected Yet"
 
-slice_index = arr.shape[0] / 2
+slice_index = arr.shape[0] // 2
+print(slice_index)
 
 half_min_side_length = min([arr.shape[1], arr.shape[2]]) / 2.0
 # the smaller of the non-verticle array sides
 
-x = [200, ];  # x and y location on plot of approx center
-y = [200, ];  # usally it is quite close to 200,200
-scale = [];
+
+x = [int(half_min_side_length), ];  # x and y location on plot of approx center
+y = [int(half_min_side_length), ];  # usally it is quite close to 200,200
+scale = [300, ];
 
 
 def get_s():
@@ -33,7 +37,9 @@ def get_s():
 
 
 def onclick(event):
-    global x, y, scale, finalized
+    global x, y, scale, finalized, locked
+    if finalized:
+        return
     
     s = get_s()  # scale for this particular instance
     
@@ -120,8 +126,9 @@ def onclick(event):
 
 def motion_notify(event):
     # this places the purple ring and lets you place it where it makes sense
-    global x, y, scale, locked
-    
+    global x, y, scale, locked, finalized
+    if locked or finalized:
+        return
     s = get_s()  # scale for this particular instance
     s = np.pi * (s ** 2)
     # clear frame and plot new stuff this time
@@ -135,14 +142,16 @@ def motion_notify(event):
         (recomend using at least 5)\n \
          right click to remove last circle or approve mean")
     plt.scatter([event.xdata], [event.ydata], s, facecolors='none'
-                , edgecolors='purple');  # adds candidate cirlce
-    plt.scatter(x, y, scale, facecolors='none',
-                edgecolors='r');  # inform matplotlib of the new data
+                , edgecolors='purple')  # adds candidate cirlce
+    
+    if len(scale)!=0:
+        plt.scatter(x, y, scale, facecolors='none',
+                    edgecolors='r')  # inform matplotlib of the new data
     plt.draw()  # redraw
 
 
 def handle_close(event):
-    global locked, finalized
+    global finalized, locked
     if finalized == False:
         sys.stdout.write("ERROR: Program not\
          properly exited bad mean returned\n")

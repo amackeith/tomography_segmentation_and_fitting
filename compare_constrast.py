@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 arr = np.load("safe_loc_norm_angle.npy")
 x = []
 for i in arr:
-    print x.append(i[3])
+    print(x.append(i[3]))
 plt.hist(x, bins=200)
 plt.show()
 exit()
@@ -28,20 +28,20 @@ segmented_only_big_labels = np.load("segmented_only_big_labels__file_in_small_sl
 '''
 segmented = np.load("segmented_using_grow_labels_file_in_lentils45pour.npy_de_noised_de_ringed.npy_binary_thresh_0.67_erosion_thresh_4.5_gauss_filt_sigma_1.75_edmthresh_2.0_min_vol_1500_.npy")
 segmented_only_big_labels =np.load("segmented_using_grow_labels_file_in_lentils45pour.npy_de_noised_de_ringed.npy_binary_thresh_0.67_erosion_thresh_4.5_gauss_filt_sigma_1.75_edmthresh_2.0_min_vol_1500_.npy")
-print "ding"
+print("ding")
 lbls = segmented.copy()
 lbls = lbls.flatten()
 lbls = list(set(lbls))
 #lbls.sort()
 num_lentils_found1 = len(lbls)-1
-print "ding"
+print("ding")
 lbls = segmented_only_big_labels.copy()
 lbls = lbls.flatten()
 lbls = list(set(lbls))
 #lbls.sort()
 num_lentils_found2 = len(lbls)-1
-print "ding"
-print num_lentils_found1, num_lentils_found2
+print("ding")
+print(num_lentils_found1, num_lentils_found2)
 exit()
 
 
@@ -54,7 +54,7 @@ exit()
 segmented = np.array(segmented>0)*1
 segmented_only_big_labels = np.array(segmented_only_big_labels>0)*1
 
-print np.sum(segmented_only_big_labels - segmented)
+print(np.sum(segmented_only_big_labels - segmented))
 
 for i in [470,]:
 
@@ -74,12 +74,12 @@ com_etc = np.load("com_angle_list_small_slice.npy_segmented_only_big_labels__fil
 vols = []
 total_vol = 0
 bad_vol=0
-print com_etc[44]
+print(com_etc[44])
 for i in com_etc[:]:
-    print i[4]
+    print(i[4])
     
     if i[3]>30000:
-        print i[0]
+        print(i[0])
         continue
     if i[3]>3430:
         total_vol += i[3]
@@ -88,7 +88,7 @@ for i in com_etc[:]:
         total_vol += i[3]
     vols.append(i[3])
 
-print total_vol, bad_vol, bad_vol/(1.0*total_vol)
+print(total_vol, bad_vol, bad_vol/(1.0*total_vol))
 
 plt.hist(vols, bins=714)
 plt.show()
@@ -116,7 +116,7 @@ def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=F
 
 
     if type not in ('bright', 'soft'):
-        print ('Please choose "bright" or "soft" for type')
+        print(('Please choose "bright" or "soft" for type'))
         return
 
     if verbose:
@@ -180,10 +180,10 @@ max_vol = 4761
 min_vol = 2846
 '''
 for particle_index in lbls[1:]:
-    #print particle_index, len(lbls)
+    #print(particle_index, len(lbls))
     mask = np.array(segmented_only_big_labels==particle_index)
     mask_vol = np.sum(mask)
-    print particle_index, len(lbls)
+    print(particle_index, len(lbls))
     if not min_vol <mask_vol<max_vol:
         segmented_only_big_labels[mask] = 0
 '''

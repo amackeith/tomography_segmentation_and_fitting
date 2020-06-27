@@ -68,7 +68,7 @@ def uf_union(x,y):
     x = int(x); y = int(y)
     tmp = uf_find(y)
     labels[uf_find(x)] = tmp
-    #print "union", x,y
+    #print("union", x,y)
     return tmp
 
 
@@ -274,7 +274,7 @@ def hoshen_kopelmann3d(original_input_int_array):
                     
     for x in range(shp[0]):
         print("find step", x, "of", shp[0])
-        #print "2",x
+        #print("2",x)
         for y in range(shp[1]):
             for z in range(shp[2]):
                 if input_int_array[x,y,z]!=0:
@@ -319,7 +319,7 @@ arr = np.array([arr[20],arr[20]])
 arr = np.load("hoshen_testing.npy")
 arr=hoshen_kopelmann3d(arr)
 arr = better_labels(arr)
-#print set(labels)
+#print(set(labels))
 #plt.imshow(arr[0])
 #plt.show()
 hoshen_kopelmann_verify_3d(arr)
@@ -330,7 +330,7 @@ for i in range(arr.shape[0]):
     arr2 = arr.copy()
     arr2 = arr2.flatten()
     arr2 = list(set(arr2))
-    print len(arr2)
+    print(len(arr2))
     plt.imshow(arr[i])
     plt.title(str(i))
     plt.show()
@@ -448,7 +448,7 @@ def grow_labels(edm_arr_in, lbl_arr_in):
         i_max = shp[0]-1
         j_max = shp[1]-1
         k_max = shp[2]-1
-        #print i_max,j_max,k_max
+        #print(i_max,j_max,k_max)
 
         if i!=i_max and j!=j_max and k!=k_max:
             #east
@@ -507,7 +507,7 @@ def grow_labels(edm_arr_in, lbl_arr_in):
 
         #say I am done looking at i,j,k
         done_arr[i,j,k] = 1
-        #print len(unvisited_labled), height
+        #print(len(unvisited_labled), height)
         
     ret_arr = better_labels(ret_arr)
     return ret_arr
@@ -517,7 +517,7 @@ def grow_labels(edm_arr_in, lbl_arr_in):
 ###test stuff
 import scipy.ndimage as ndi
 import matplotlib.pyplot as plt
-print "ding"
+print("ding")
 arr = np.array([[1,0,1,1,0,0,1,1,1,1,1,1,1,1,0],
                 [0,1,1,0,0,1,0,0,1,1,1,0,0,0,1],
                 [0,1,1,1,1,0,0,0,0,1,0,1,1,1,1],
@@ -534,16 +534,16 @@ arr = np.load("thresh_np_image_file_in_de_noised_de_ringed.npy_binary_thresh_0.7
 arr = np.array(arr[20:33, 40:60, 50:80])
 arr = ndi.binary_erosion(arr)
 arr = -1*arr+1
-print arr.shape
+print(arr.shape)
 
 arr = hoshen_kopelmann3d(arr)
 
 plt.imshow(arr[6])
 plt.show()
-print arr[6,20:30,20:30]
+print(arr[6,20:30,20:30])
 exit()
 
-print arr[0,0,0], arr[-1:-1:-1]
+print(arr[0,0,0], arr[-1:-1:-1])
 plt.imshow(arr[6])
 plt.show()
 '''

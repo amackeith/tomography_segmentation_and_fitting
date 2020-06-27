@@ -19,7 +19,7 @@ fname = "segmented_only_big_labels__file_in_lentil45fresh1210.npy_de_noised_de_r
 
 data = np.load(fname)
 save_data = data.copy()
-print data.shape
+print(data.shape)
 #tack on a buffer around the edges so you can slice a whole padding by padding by padding chunk out
 shp = np.array(data.shape)+2*padding
 nest = np.zeros(shp)
@@ -54,7 +54,7 @@ total_vol = []
 other_vols = []
 for i in lbls[1:]:
 	i = int(i)
-	print i, com_etc[i-1][4] 
+	print(i, com_etc[i-1][4] )
 
 
 
@@ -68,7 +68,7 @@ for i in lbls[1:]:
 		other_vols.append(com_etc[i-1][3])
 
 
-print np.sum(vols), np.sum(total_vol), np.sum(vols)/(1.0*np.sum(total_vol))
+print(np.sum(vols), np.sum(total_vol), np.sum(vols)/(1.0*np.sum(total_vol)))
 
 plt.hist(other_vols, bins=100)
 plt.show()
@@ -96,7 +96,7 @@ def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=F
 
 
     if type not in ('bright', 'soft'):
-        print ('Please choose "bright" or "soft" for type')
+        print(('Please choose "bright" or "soft" for type'))
         return
 
     if verbose:
@@ -178,7 +178,7 @@ from mayavi import mlab
 
 arr = np.array(double_counts>0)*1
 
-print arr.shape
+print(arr.shape)
 mlab.pipeline.volume(mlab.pipeline.scalar_field(arr), color=(1,0,0))
 mlab.show()
 
@@ -191,7 +191,7 @@ lbls = lbls.flatten()
 lbls = list(set(lbls))
 lbls.sort()
 
-print len(lbls)
+print(len(lbls))
 co=0
 com_angle_norm_vol = []
 for particle_index in lbls[1:]:   #the first elt is the big part that is all zero
@@ -202,7 +202,7 @@ for particle_index in lbls[1:]:   #the first elt is the big part that is all zer
 		continue
 	else:
 		co+=1
-		print co
+		print(co)
 		continue
 	
 
@@ -255,8 +255,8 @@ for particle_index in lbls[1:]:   #the first elt is the big part that is all zer
 
 	#mlab.contour3d(arr)
 
-	print lentil, particle_index
-	print binary.shape, arr.shape
+	print(lentil, particle_index)
+	print(binary.shape, arr.shape)
 
 	#mlab.pipeline.volume(mlab.pipeline.scalar_field(binary), color=(0,1,0))
 	mlab.pipeline.volume(mlab.pipeline.scalar_field(arr), color=(1,0,0))
@@ -264,4 +264,4 @@ for particle_index in lbls[1:]:   #the first elt is the big part that is all zer
 	mlab.show()
 	
 
-print co
+print(co)
