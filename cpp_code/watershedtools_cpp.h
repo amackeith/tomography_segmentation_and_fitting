@@ -19,11 +19,6 @@ void grow_labels_interface(double *done_arr_interface,
                            int edm_arr_y_interface,
                            int edm_arr_z_interface);
 
-void better_labels_interface(int *in_arr,
-                             int maxx, int maxy, int maxz,
-                             int *output_array,
-                             int maxx_, int maxy_, int maxz_);
-
 void hoshen_kopelman3d_interface(int *in_arr,
                                  int maxx, int maxy, int maxz);
 

@@ -37,9 +37,12 @@ import_array();
 
 
 
-%apply (double* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3) {(double* output_array, int x, int y, int z)}
-%apply (double* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3) {(double* input_array_1, int a, int b, int c)}
-%apply (double* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3) {(double* input_array_2, int d, int e, int f)}
+%apply (double* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3)
+ {(double* output_array, int x, int y, int z)}
+%apply (double* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3)
+ {(double* input_array_1, int a, int b, int c)}
+%apply (double* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3)
+ {(double* input_array_2, int d, int e, int f)}
 
 
 

@@ -4,19 +4,34 @@
 #include <unistd.h>
 #endif
 #include <cstdlib>
-
-
 #include <iostream>
 #include <math.h>
 #include <vector>
 #include <set>
 #include <bits/stdc++.h>
+
+/*
+Author: Arthur MacKeith
+Date: July 7, 2020
+
+Based on methods of Fabian M. Schaller, Matthias Schoter et al.
+"Tomographic Analysis of Jammed Ellipsiod Packings"
+in "Powders and Grains 2013"
+
+There is a python verion of this code in the main project directory.
+That code is as close to this code as possible. This code is a transcription of
+that code into cpp. The python has much better documentation so to understand
+the algorithms, (particularly the labeling scheme for grow_labels), I recommend
+looking at the explanation of the algorithm in that code.
+*/
+
+
 using namespace std;
 class union_find{
 public:
 
     //implementation of union find algorithm
-    //sorry it is a bit sparce
+    //sorry it is a bit sparse
     std::vector<int> labels;
     int number_of_labels;
 
@@ -26,14 +41,11 @@ public:
     }
 
     int uf_find(int x){
-        //cout << "UF FIND START\n";
 
         int y = x;
-        //cout << "SIZE LABELS " << labels.size() << " x " << x <<"\n";
         while (labels[y] != y){
             y = labels[y]; //this makes y the name of a set
         }
-        //cout << "UF FIND END 0 \n";
 
         while (labels[x] != x){
             int z = labels[x];
@@ -41,7 +53,6 @@ public:
             x = z;
         }
 
-        //cout << "UF FIND END\n";
         return y;
     }
 
@@ -85,6 +96,8 @@ private:
     int ymax;
     int zmax;
 public:
+
+    // constructor just stores arrays.
     grow_labels(double *done_arr_in,
                      int done_arr_x_in, int done_arr_y_in, int done_arr_z_in,
                     double *ret_arr_in,
@@ -110,7 +123,8 @@ public:
         process();
     }
 
-
+    // ###################################
+    // helper functions
     double ret_arr_at(int x, int y, int z){
         return ret_arr[ymax*zmax*x + zmax*y + z];
     }
@@ -150,6 +164,9 @@ public:
 
     }
 
+    // ###################################
+
+
 
     void process(){
 
@@ -174,10 +191,14 @@ public:
             }
         }
 
+        // FOR DEBUGGING
+        /*
         cout << " setting up done array complete\n";
         cout << "sum of done array: " << sum_matrix(done_arr) << "\n";
         cout << "sum of ret array: " << sum_matrix(ret_arr) << "\n";
         cout << "sum of edm array: " << sum_matrix(edm_arr) << "\n";
+        */
+
         //set up the min heap
         //edm height, then the coordinates
         priority_queue<pair<double, vector<int>> > pq;
@@ -200,13 +221,13 @@ public:
             }
         }
 
-        cout << " priority queue set up\n";
+        //cout << " priority queue set up\n";
 
         int i,j,k;
         double height;
 
         while (!pq.empty()){
-            if (pq.size() % 10000 == 0) {
+            if (pq.size() % 50000 == 0) {
                 cout << " pq length is " << pq.size() << "\n";
             }
 
@@ -273,7 +294,6 @@ void grow_labels_interface(double *done_arr_interface,
                            int edm_arr_y_interface,
                            int edm_arr_z_interface){
 
-    cout << " grow labels interface called\n";
     grow_labels(done_arr_interface,
             done_arr_x_interface,
             done_arr_y_interface,
@@ -291,70 +311,6 @@ void grow_labels_interface(double *done_arr_interface,
 
 
 
-class better_labels {
-    // the python version of this with numpy is actually faster
-    // but I only found out after I wrote this, leaving this here for
-    // completeness
-    int *arr;
-    int *output_arr;
-    int xmax;
-    int ymax;
-    int zmax;
-public:
-    better_labels(int *processed_array,
-                int maxx, int maxy, int maxz,
-                int *output_array):
-                arr(processed_array), output_arr(output_array),
-                xmax(maxx), ymax(maxy), zmax(maxz){
-        process();
-    }
-
-    void process(){
-        int next_label = 0;
-
-        set<int> lbls;
-        set<int>::iterator lbls_itter;
-
-        for (int x = 0; x < xmax; x++) {
-            for (int y = 0; y < ymax; y++) {
-                for (int z = 0; z < zmax; z++) {
-                    lbls.insert(arr[ymax*zmax*x + zmax*y + z]);
-                }
-            }
-        }
-
-        for (lbls_itter = lbls.begin(); lbls_itter != lbls.end(); ++lbls_itter){
-            if (*lbls_itter != 0){
-
-                next_label += 1;
-
-                for (int x = 0; x < xmax; x++) {
-                    for (int y = 0; y < ymax; y++) {
-                        for (int z = 0; z < zmax; z++) {
-                            if (arr[ymax*zmax*x + zmax*y + z] == *lbls_itter){
-                                output_arr[ymax*zmax*x + zmax*y + z] =
-                                        next_label;
-                            }
-                        }
-                    }
-                }
-
-            }
-
-
-        }
-    }
-};
-
-
-void better_labels_interface(int *in_arr,
-                           int maxx, int maxy, int maxz,
-                           int *output_array,
-                           int maxx_, int maxy_, int maxz_){
-    better_labels(in_arr,
-                  maxx, maxy, maxz,
-                  output_array);
-}
 
 
 
@@ -424,10 +380,14 @@ public:
 
                                         if (neighbor_value > 0) {
                                             non_zeros += 1;
-                                            //cout << "neighbor value" << neighbor_value << "\n";
-                                            //cout << (i + di) << " " << (j + dj ) << " " <<  (k + dk) << "\n";
-
-                                            nearby_values.insert(neighbor_value);
+                                            /*cout <<
+                                            "neighbor value" <<
+                                             neighbor_value << "\n";
+                                            cout << (i + di) << " " << (j + dj )
+                                             << " " <<  (k + dk) << "\n";
+                                             */
+                                            nearby_values.insert(
+                                                                neighbor_value);
                                         }
                                     } //add all the neighbors to nearby values
                                 }
@@ -440,7 +400,8 @@ public:
                         int max_set = 0;
                         //
                         set<int>::iterator nbv_it = nearby_values.begin();
-                        for (nbv_it = nearby_values.begin() ; nbv_it != nearby_values.end(); nbv_it++) {
+                        for (nbv_it = nearby_values.begin() ;
+                         nbv_it != nearby_values.end(); nbv_it++) {
                             s += *nbv_it;
                             if (*nbv_it > max_set) {
                                 max_set = *nbv_it;
@@ -461,11 +422,13 @@ public:
 
 
                         if (s == 0) { //no labels touching it yet
-                            arr[zmax * ymax * i + zmax * j + k] = uf.uf_make_set();
+                            arr[zmax * ymax * i + zmax * j + k] =
+                                                            uf.uf_make_set();
 
                         } else if (nearby_values.size() == 1 && s > 0) {
                             //there is exactly one label touching it
-                            arr[zmax * ymax * i + zmax * j + k] = max_set; //max is
+                            arr[zmax * ymax * i + zmax * j + k] = max_set;
+                            //max is
                             //arbirary choice, just so this is consistent
                             // accross runs
                         } else {
@@ -493,13 +456,11 @@ public:
                 }
             }
         }
-        cout << "SUM OF THINGS " << non_zeros << "\n";
         //now we have to fix all the sets that might not be in once piece;
 
         int s = 0;
-        cout << "it is the find step\n";
         for (int i = 0; i < xmax; i++) {
-            if ( i % 50 == 0){
+            if ( i % 100 == 0){
             cout << " find step " << i << " of " << xmax << "\n";
             }
 
@@ -517,28 +478,6 @@ public:
         }
 
 
-
-
-        cout << "PRINT" << uf.number_of_labels <<  "\n";
-        long int sum = 0 ;
-        for (int i = 0; i < xmax; i++) {
-            for (int j = 0; j < ymax; j++) {
-                for(int k = 0; k < zmax; k++){
-                    //
-                    if (arr[ymax * zmax * i + zmax * j + k] > 10 || -10 > arr[ymax * zmax * i + zmax * j + k]){
-                    // cout << arr[ymax * zmax * i + zmax * j + k] << " " << i << " " << j << " " << k << "\n";
-                    }
-                    sum += arr[ymax * zmax * i + zmax * j + k];
-                }
-
-                }
-
-        }
-        cout << "PRINT2\n";
-
-
-        cout << "sum is " << sum << "\n";
-
     }
 
 
@@ -547,7 +486,6 @@ public:
 void hoshen_kopelman3d_interface(int *in_arr,
                   int maxx, int maxy, int maxz){
     hoshen_kopelman3d(in_arr, maxx, maxy, maxz);
-    cout << "interface returns\n";
 }
 
 
@@ -571,6 +509,10 @@ void remove_small_labels_interface(int min_vol,
                                    int *in_arr,
                                    int maxx, int maxy, int maxz){
 
+    //This was not in the original tool kit, it was just something
+    //to improve the speed a bit,
+    // there is equivlent python code in the section where this is called
+    // in watershed_segmentation.py
     map<int, int> label_count;
 
     for (int i = 0; i < maxx; i++) {
@@ -602,11 +544,4 @@ void remove_small_labels_interface(int min_vol,
             }
         }
     }
-
-
-
-
-
-
-
 }

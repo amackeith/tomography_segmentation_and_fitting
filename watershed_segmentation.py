@@ -27,7 +27,7 @@ import sys, os
 
 from scipy.stats import scoreatpercentile
 
-from hoshen_kopelmann_with_union_find import \
+from watershedtools_py import \
     hoshen_kopelmann3d, grow_labels, better_labels
 
 # this block is to allow the use of this code without cpp speedup

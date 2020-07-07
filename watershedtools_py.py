@@ -7,7 +7,12 @@ Based on methods of Fabian M. Schaller, Matthias Schoter et al.
 in "Powders and Grains 2013"
 
 
-hoshen_kopelmann.py
+There is a cpp version of this code in the cpp_code folder of this project
+That code runs an order of magnitude faster so if you can get it to work it is
+well worth it.
+
+This python code is as close as I could make it, so hopefully if the cpp is
+difficult to understand the python code can be a guide to what is going on.
 =========
 '''
 
@@ -17,7 +22,8 @@ import heapq
 
 # makes the labels count from 1 to N rather than having them all over the map
 def better_labels(processed_array):
-    # relabels an array (skipping 0) so that labels begin at 1 and go up to the number of labels
+    # relabels an array (skipping 0) so that labels begin at 1
+    # and go up to the number of labels
     arr = np.int32(processed_array.copy())
     
     lbls = arr.copy()
@@ -191,7 +197,8 @@ def hoshen_kopelmann_verify_3d(array):
                         if array[i, j, k] == item:
                             pass
                         else:
-                            print("hoshen_kopelmann3d_union_find failed", i, j, k)
+                            print("hoshen_kopelmann3d_union_find failed",
+                                  i, j, k)
 
 
 def hoshen_kopelmann3d(original_input_int_array):
@@ -205,8 +212,8 @@ def hoshen_kopelmann3d(original_input_int_array):
         for j in range(shp[1]):
             for k in range(shp[2]):
                 if input_int_array[i, j, k] == -1:
-                    
-                    nearby_values = []  # this will contain the nearby sets names
+                    # this will contain the nearby sets names
+                    nearby_values = []
                     
                     # north and west and back
                     # these are actually the only ones we care about bc
@@ -263,14 +270,17 @@ def hoshen_kopelmann3d(original_input_int_array):
                     s = sum(nearby_values)
                     if s == 0:  # no labels touching it yet
                         input_int_array[i, j, k] = uf_make_set()
-                    elif (len(nearby_values) == 1 and s > 0):  # there is only one non-zero label touchign
+                    elif (len(nearby_values) == 1 and s > 0):
+                        # there is only one non-zero label touchign
                         input_int_array[i, j, k] = nearby_values[0]
                         #only nonzero value
                     else:
-                        # there are multiple values and they must be unioned (this is arbitrary)
+                        # there are multiple values and they must be unioned
+                        # (this is arbitrary) but consistent with the cpp code
                         for lbl in nearby_values[1:]:
                             #nearby_values[0] is max nearby values
-                            input_int_array[i, j, k] = uf_union(nearby_values[0], lbl)
+                            input_int_array[i, j, k] = \
+                                uf_union(nearby_values[0], lbl)
     
     for x in range(shp[0]):
         print("find step", x, "of", shp[0])
@@ -293,40 +303,54 @@ def hoshen_kopelmann3d(original_input_int_array):
 # this function grows the labels given an edm array and a seed array
 # it expects two same shape arrays
 
+# ### edm -> Euclidian distance map.
+# in analogy to real watersheds, lbl_arr_in are the drains, and edm_arr_in
+# represents the topology of the land (in this case though the "water" would
+# flow up the gradient (and the drains are at the local maxima of the edm
+# array.
 def grow_labels(edm_arr_in, lbl_arr_in):
     lbl_arr = lbl_arr_in.copy()  # array with the labels that will be grown
     edm_arr = edm_arr_in.copy()  # array with "height map" of volume
-    if not (np.array_equal(edm_arr.shape, lbl_arr.shape) and len(edm_arr.shape) == 3):
-        print("grow_labels in hoshen_kopelmann.py passed two different size arrays or not length 3")
+    if not (np.array_equal(edm_arr.shape, lbl_arr.shape)
+            and len(edm_arr.shape) == 3):
+        print("grow_labels in hoshen_kopelmann.py passed two "
+              "different size arrays or not length 3")
     
-    # this is the array that we will update as we go, so that the lbl_arr is not changed in place
+    # this is the array that we will update as we go,
+    # so that the lbl_arr is not changed in place
     
     ret_arr = lbl_arr.copy()
     
-    # this will be the guide that tells us what we have done so far and what is still left to do.
+    # this will be the guide that tells us what we have done so far
+    # and what is still left to do.
     # dictionary: done =1, unvisited but labeled: 2, unvisited and unlabeled:0
     # done contains both all the background as well as the visited and labeled.
-    # this algorithm will have some unvisited and unlabled on voxels left at the end, these are the ones
+    # this algorithm will have some unvisited and unlabled on voxels left at the
+    # end, these are the ones
     # that were part of lbls that are small and unconnected
-    # these will be the ones that are unconnected to anything and will be thrown out. ie set to done if
+    # these will be the ones that are unconnected to anything and will be
+    # thrown out. ie set to done if
     # there are no more labled but unvisited
     
     # set everything that is zero in edm to 1 (done) in done array
     done_arr = np.zeros(edm_arr.shape)
     done_arr[edm_arr == 0] = 1
-    # set all labeled voxels to unvisited, labled (2), the rest (unvisited unlabled) being 0
+    # set all labeled voxels to unvisited, labled (2),
+    # the rest (unvisited unlabled) being 0
     done_arr[ret_arr > 0] = 2
     
     # now make a heap of unvisited and labled voxels
     unvisited_labled = []
     
-    # we will visit voxels in decending order of height to we grow the lbls out from the center of each lentil
+    # we will visit voxels in decending order of height to we grow
+    # the lbls out from the center of each lentil
     
     shp = done_arr.shape
     for i in np.arange(done_arr.shape[0]):
         for j in np.arange(done_arr.shape[1]):
             for k in np.arange(done_arr.shape[2]):
-                if done_arr[i, j, k] == 2:  # ie if this location is unvisited but labeled
+                if done_arr[i, j, k] == 2:
+                    # ie if this location is unvisited but labeled
                     height = edm_arr[i, j, k]
                     loc = [i, j, k]
                     # make the height negative bc this is a min heap
@@ -341,13 +365,17 @@ def grow_labels(edm_arr_in, lbl_arr_in):
             print("grow labels", len(unvisited_labled), "left to go")
         unv_lbl = heapq.heappop(unvisited_labled)
         # now we will properly update neighbors
-        # look at the 6 close by voxels, if any are unvisited+unlabled and have a lower height
+        # look at the 6 close by voxels, if any are
+        # unvisited+unlabled and have a lower height
         # assign them to the label of unv_lbl, otherwise leave them alone
         i, j, k = unv_lbl[1]
         height = -1 * unv_lbl[0]  # remember to make it positive again
         
         nearby_values = []
         # north and west and back
+        # sorry about this it is very verbose way to write a filter.
+        # in short it checks the three voxesl behind the leading corner
+        # of the way this is itterating. and then in front
         if i != 0 and j != 0 and k != 0:
             # west
             nearby_values.append([i - 1, j, k])
@@ -457,37 +485,4 @@ def grow_labels(edm_arr_in, lbl_arr_in):
     return ret_arr
 
 
-'''
-###test stuff
-import scipy.ndimage as ndi
-import matplotlib.pyplot as plt
-print("ding")
-arr = np.array([[1,0,1,1,0,0,1,1,1,1,1,1,1,1,0],
-                [0,1,1,0,0,1,0,0,1,1,1,0,0,0,1],
-                [0,1,1,1,1,0,0,0,0,1,0,1,1,1,1],
-                [1,0,1,1,0,1,0,0,0,0,1,1,0,0,1],
-                [0,0,1,1,0,0,0,0,1,0,0,0,1,0,1],
-                [1,0,1,0,1,0,0,0,1,0,0,1,0,1,1],
-                [1,1,0,0,1,0,1,1,1,1,1,1,1,1,0],
-                [1,0,0,1,1,1,0,0,1,1,1,0,0,1,1],
-                [1,1,0,1,1,1,0,1,0,1,0,0,1,0,0],
-                [0,0,1,0,0,1,1,0,1,1,0,1,1,0,0]])
 
-arr = np.load("thresh_np_image_file_in_de_noised_de_ringed.npy_binary_thresh_0.7_erosion_thresh_4.5_gauss_filt_sigma_1.75_edmthresh_1.4_min_vol_1500_.npy")
-
-arr = np.array(arr[20:33, 40:60, 50:80])
-arr = ndi.binary_erosion(arr)
-arr = -1*arr+1
-print(arr.shape)
-
-arr = hoshen_kopelmann3d(arr)
-
-plt.imshow(arr[6])
-plt.show()
-print(arr[6,20:30,20:30])
-exit()
-
-print(arr[0,0,0], arr[-1:-1:-1])
-plt.imshow(arr[6])
-plt.show()
-'''

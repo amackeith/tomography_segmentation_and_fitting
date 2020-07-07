@@ -1,2 +1,3 @@
 *.npy
 *.png
+!example_binary_thresh.npy 
