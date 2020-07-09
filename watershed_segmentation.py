@@ -12,21 +12,13 @@ basically this is just three sliders using matplot lib, an example to match
 and it saves the threshold to 2 decimal places
 '''
 
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.widgets import Slider, Button, RadioButtons
-import matplotlib
+
+from matplotlib.widgets import Slider
 import matplotlib.animation as animation
-import random
 import numpy as np
 import matplotlib.pyplot as plt
-import time
-import scipy
 import scipy.ndimage as ndi
-import sys, os
-
 from scipy.stats import scoreatpercentile
-
 from watershedtools_py import \
     hoshen_kopelmann3d, grow_labels, better_labels
 
@@ -36,16 +28,14 @@ from watershedtools_py import \
 # and don't know how, the python code is just as correct.
 cpp_enabled = True
 try:
-    import cpp_code.watershedtools_cpp as watershedtools_cpp
+    import watershedtools_cpp.watershedtools_cpp as watershedtools_cpp
 except:
     print("CPP code not enabled")
-    print("to build and enable it run ./build in the cpp_code folder")
+    print("to build and enable it run ./build in the watershedtools_cpp folder")
     print("Proceeding using SLOWER python code")
     cpp_enabled = False
 
 
-# TODO Rewrite all the hoshen_kopelman stuff in CPP
-# TODO also write something for masking small sections in cpp
 
 
 class threshold_selector:
@@ -186,12 +176,9 @@ class watershed_pipeline:
         # particles
         if cpp_enabled:
             
-            before = np.sum(self.thresh_np_image)
-            print("HELP", before)
             tmp = np.int32(self.thresh_np_image != 0)
-            watershedtools_cpp.hoshen_kopelman3d_interface(tmp)
+            watershedtools_cpp.hoshen_kopelman3d_interface(tmp, self.debug)
             self.hoshen_np_image = tmp
-            print("HELP", before, np.sum(tmp != 0))
 
         else:
             self.hoshen_np_image = hoshen_kopelmann3d(self.thresh_np_image)
@@ -223,21 +210,21 @@ class watershed_pipeline:
         # Hoshen Kopelmann then actually labels all of the isolated segments
         if cpp_enabled:
             self.labeled_centers = np.int32(self.eroded_binary_thresh.copy())
-            watershedtools_cpp.hoshen_kopelman3d_interface(self.labeled_centers)
+            watershedtools_cpp.hoshen_kopelman3d_interface(self.labeled_centers,
+                                                           self.debug)
         else:
             self.labeled_centers = hoshen_kopelmann3d(self.eroded_binary_thresh)
             
-        
+        if self.use_better_labels:
+            self.labeled_centers = better_labels(self.labeled_centers)
 
         if self.debug:
             np.save(self.fname + "_eroded_binary.npy", self.eroded_binary)
-            if self.use_better_labels:
-                np.save(self.fname + "_labeled_centers.npy",
-                        better_labels(self.labeled_centers))
-            else:
-                np.save(self.fname + "_labeled_centers.npy",
-                        self.labeled_centers)
-        
+            
+            
+            np.save(self.fname + "_labeled_centers.npy",
+                    self.labeled_centers)
+            
     def create_grow_labels_edm(self):
         # this part creates the "topology" of the "watershed"
         # To use the labels found in find centesr of
@@ -283,21 +270,20 @@ class watershed_pipeline:
             done_array = np.zeros(self.edm_of_ellipsiod_phase.shape)
             self.segmented = self.labeled_centers.copy()*1.0
             watershedtools_cpp.grow_labels_interface(done_array,
-                                                     self.segmented,
-                                                     self.edm_of_ellipsiod_phase)
-            print(np.sum(self.segmented), np.sum(done_array), np.sum(self.edm_of_ellipsiod_phase))
+                                                 self.segmented,
+                                                 self.edm_of_ellipsiod_phase,
+                                                 self.debug)
+            
             
         else:
             self.segmented = grow_labels(self.edm_of_ellipsiod_phase,
                                          self.labeled_centers)
         
+        if self.use_better_labels:
+            self.segmented = better_labels(self.segmented)
+        
         if self.debug:
-            if self.use_better_labels:
-
-                np.save(self.fname + "_first_grow_labels.npy",
-                        better_labels(self.segmented))
-            else:
-                np.save(self.fname + "_first_grow_labels.npy", self.segmented)
+            np.save(self.fname + "_first_grow_labels.npy", self.segmented)
             
     def remove_small_labels(self):
         self.segmented_only_big_labels = self.segmented.copy()
@@ -365,8 +351,9 @@ class watershed_pipeline:
             done_array = np.zeros(self.edm_of_ellipsiod_phase.shape)
             self.segmented_only_big_labels = self.segmented_only_big_labels*1.0
             watershedtools_cpp.grow_labels_interface(done_array,
-                                                     self.segmented_only_big_labels,
-                                                     self.edm_of_ellipsiod_phase)
+                                                 self.segmented_only_big_labels,
+                                                 self.edm_of_ellipsiod_phase,
+                                                 self.debug)
         else:
             self.segmented_only_big_labels = \
                 grow_labels(self.edm_of_ellipsiod_phase,
@@ -379,15 +366,15 @@ class watershed_pipeline:
         self.num_lentils_found = len(lbls) - 1
         print(self.num_lentils_found)
         
-        if self.debug:
-            if self.use_better_labels:
-
-                np.save(self.fname + "_second_grow_labels.npy",
-                        better_labels(self.segmented_only_big_labels))
-            else:
-                np.save(self.fname + "_second_grow_labels.npy",
-                        self.segmented_only_big_labels)
+        if self.use_better_labels:
+            self.segmented_only_big_labels = \
+                better_labels(self.segmented_only_big_labels)
         
+        if self.debug:
+            
+            np.save(self.fname + "_second_grow_labels.npy",
+                    self.segmented_only_big_labels)
+    
     
     def load_saved_parts(self):
         cnt = 0

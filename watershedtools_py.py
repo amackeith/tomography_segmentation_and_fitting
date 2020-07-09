@@ -7,7 +7,7 @@ Based on methods of Fabian M. Schaller, Matthias Schoter et al.
 in "Powders and Grains 2013"
 
 
-There is a cpp version of this code in the cpp_code folder of this project
+There is a cpp version of this code in the watershedtools_cpp folder of this project
 That code runs an order of magnitude faster so if you can get it to work it is
 well worth it.
 

@@ -213,6 +213,8 @@ class tomo_preprocessor:
         self.volume = np.load(fname)
         self.center_x = center_x
         self.center_y = center_y
+        # if less than 2*width this will mask a cylinder
+        # centered at the selected centerx center
         self.mask_radius = mask_radius
 
         #save starting volume to output folder
@@ -227,7 +229,7 @@ class tomo_preprocessor:
         # this makes the smallest 0.5 values equal to zero
 
         if self.debug:
-            np.save(fname[:-4] + "_center.npy", np.array([center_x, center_y]))
+            np.save(self.fname[:-4] + "_center.npy", np.array([center_x, center_y]))
             # starting distribution display
             tmp = self.volume.copy()
             tmp = tmp.flatten()

@@ -45,6 +45,18 @@ import_array();
  {(double* input_array_2, int d, int e, int f)}
 
 
+%apply (int* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3)
+ {(int* in_arr, int xmax, int ymax, int zmax)}
+
+%apply (double* INPLACE_ARRAY2, int DIM1, int DIM2)
+ {(double *moment_of_inertia, int xmoi, int ymoi)}
+
+
+%apply (int* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3)
+ {(int* in_arr, int xmax, int ymax, int zmax)}
+
+%apply (double* INPLACE_ARRAY1, int DIM1)
+ {(double *com, int comlen)}
 
 
 

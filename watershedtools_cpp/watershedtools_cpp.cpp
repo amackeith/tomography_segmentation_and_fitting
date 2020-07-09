@@ -9,6 +9,7 @@
 #include <vector>
 #include <set>
 #include <bits/stdc++.h>
+#include <stdexcept>
 
 /*
 Author: Arthur MacKeith
@@ -60,6 +61,7 @@ public:
         //unions two together by pionting theone at the other;
         if (x == 0 || y ==0){
             std::cout << "Major malfunction in hoshen kopelman\n";
+            throw std::invalid_argument("Major malfunction in hoshen kopelman");
             return 0;
         }
         int tmp = uf_find(y);
@@ -95,6 +97,7 @@ private:
     int xmax;
     int ymax;
     int zmax;
+    bool debug;
 public:
 
     // constructor just stores arrays.
@@ -103,7 +106,8 @@ public:
                     double *ret_arr_in,
                     int ret_arr_x_in, int ret_arr_y_in, int ret_arr_z_in,
                     double *edm_arr_in,
-                    int edm_arr_x_in, int edm_arr_y_in, int edm_arr_z_in):
+                    int edm_arr_x_in, int edm_arr_y_in, int edm_arr_z_in,
+                    bool debug_=false):
             done_arr(done_arr_in),
             done_arr_x(done_arr_x_in),
             done_arr_y(done_arr_y_in),
@@ -115,11 +119,11 @@ public:
             edm_arr(edm_arr_in),
             edm_arr_x(edm_arr_x_in),
             edm_arr_y(edm_arr_y_in),
-            edm_arr_z(edm_arr_z_in) {
+            edm_arr_z(edm_arr_z_in),
+            debug(debug_) {
         xmax = done_arr_x;
         ymax = done_arr_y;
         zmax = done_arr_z;
-        cout << " process called \n";
         process();
     }
 
@@ -207,8 +211,8 @@ public:
         //pair<double, vector<int> top = pq.top();
 
         for (int x = 0; x < xmax; x++){
-            if (x % 50 == 0.0) {
-                cout << x << " of 2  " << xmax << "\n";
+            if (x % 50 == 0.0 && debug) {
+                cout << x << " of  " << xmax << "\n";
             }
             for (int y = 0; y < ymax; y++){
                 for (int z = 0; z < zmax; z++){
@@ -227,7 +231,7 @@ public:
         double height;
 
         while (!pq.empty()){
-            if (pq.size() % 50000 == 0) {
+            if (pq.size() % 50000 == 0 && debug) {
                 cout << " pq length is " << pq.size() << "\n";
             }
 
@@ -292,7 +296,8 @@ void grow_labels_interface(double *done_arr_interface,
                            double *edm_arr_interface,
                            int edm_arr_x_interface,
                            int edm_arr_y_interface,
-                           int edm_arr_z_interface){
+                           int edm_arr_z_interface,
+                           bool debug){
 
     grow_labels(done_arr_interface,
             done_arr_x_interface,
@@ -305,7 +310,8 @@ void grow_labels_interface(double *done_arr_interface,
             edm_arr_interface,
             edm_arr_x_interface,
             edm_arr_y_interface,
-            edm_arr_z_interface);
+            edm_arr_z_interface,
+            debug);
 
 }
 
@@ -321,10 +327,11 @@ public:
     int xmax;
     int ymax;
     int zmax;
+    bool debug;
 
     hoshen_kopelman3d(int *in_arr,
-            int maxx, int maxy, int maxz): arr(in_arr),
-            xmax(maxx), ymax(maxy), zmax(maxz){
+            int maxx, int maxy, int maxz, bool debug_=false): arr(in_arr),
+            xmax(maxx), ymax(maxy), zmax(maxz), debug(debug_){
         process();
     }
 
@@ -351,7 +358,7 @@ public:
         int non_zeros = 0;
 
         for (int i = 0; i < xmax; i++) {
-            if ( i % 50 == 0){
+            if ( i % 50 == 0 && debug){
             cout << " total traversal " << i << " of " << xmax << "\n";
             }
             for (int j = 0; j < ymax; j++) {
@@ -460,7 +467,7 @@ public:
 
         int s = 0;
         for (int i = 0; i < xmax; i++) {
-            if ( i % 100 == 0){
+            if ( i % 100 == 0 && debug){
             cout << " find step " << i << " of " << xmax << "\n";
             }
 
@@ -484,8 +491,9 @@ public:
 };
 
 void hoshen_kopelman3d_interface(int *in_arr,
-                  int maxx, int maxy, int maxz){
-    hoshen_kopelman3d(in_arr, maxx, maxy, maxz);
+                  int maxx, int maxy, int maxz,
+                  bool debug){
+    hoshen_kopelman3d(in_arr, maxx, maxy, maxz, debug);
 }
 
 
@@ -545,3 +553,86 @@ void remove_small_labels_interface(int min_vol,
         }
     }
 }
+
+
+
+void calculate_moment_of_inertia(int *in_arr,
+                           int xmax,
+                           int ymax,
+                           int zmax,
+                           double *moment_of_inertia,
+                           int xmoi,
+                           int ymoi,
+                           double x_center_of_mass,
+                           double y_cneter_of_mass,
+                           double z_center_of_mass){
+
+    if (xmoi != 3 || ymoi != 3){
+        cout << "The moment of inertia matrix is the wrong shape crashing";
+        throw std::invalid_argument("Moment of inertia matrix wrong shape");
+    }
+
+    ymoi = 3;
+
+    for (int i = 0; i < xmax; i++) {
+        for (int j = 0; j < ymax; j++) {
+            for (int k = 0; k < zmax; k++) {
+                if (in_arr[i * ymax * zmax + j * zmax + k] == 1){
+                    int x, y, z;
+                    x = i - x_center_of_mass;
+                    y = j - y_cneter_of_mass;
+                    z = k - z_center_of_mass;
+
+                    moment_of_inertia[2*0 + 0] = moment_of_inertia[2*0 + 0] + pow(y, 2) + pow(z, 2); //I_xx
+                    moment_of_inertia[2*1 + 1] = moment_of_inertia[2*1 + 1] + pow(x, 2) + pow(z, 2); // I_yy
+                    moment_of_inertia[2*2 + 2] = moment_of_inertia[2*2 + 2] + pow(x, 2) + pow(y, 2); //I_zz
+                    moment_of_inertia[2*0 + 1] = moment_of_inertia[2*0 + 1] - x * y; //I_xy
+                    moment_of_inertia[2*1 + 2] = moment_of_inertia[2*1 + 2] - y * z; //I_yz
+                    moment_of_inertia[2*0 + 2] = moment_of_inertia[2*0 + 2] - x * z; //I_zx
+
+                }
+            }
+        }
+    }
+    moment_of_inertia[2*1 + 0] = moment_of_inertia[2*0 + 1]; //I_yx
+    moment_of_inertia[2*2 + 1] = moment_of_inertia[2*1 + 2]; //I_zy
+    moment_of_inertia[2*2 + 0] = moment_of_inertia[2*0 + 2]; //I_zx
+}
+
+void center_of_mass(int *in_arr,
+                    int xmax,
+                    int ymax,
+                    int zmax,
+                    double *com,
+                    int comlen){
+    double x;
+    double y;
+    double z; //centers of mass in respective coords
+    double count;
+    count = 0.0;
+    x = 0.0;
+    y = 0.0;
+    z = 0.0;
+
+    for (int i = 0; i < xmax; i++) {
+        for (int j = 0; j < ymax; j++) {
+            for (int k = 0; k < zmax; k++) {
+                if (in_arr[i * ymax * zmax + j * zmax + k] != 0){
+                    count += 1;
+                    x += i;
+                    y += j;
+                    z += k;
+                }
+            }
+        }
+    }
+    x = x / count;
+    y = y / count;
+    z = z / count;
+
+    com[0] = x;
+    com[1] = y;
+    com[2] = z;
+}
+
+
