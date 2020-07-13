@@ -358,8 +358,6 @@ def grow_labels(edm_arr_in, lbl_arr_in):
                     heapq.heappush(unvisited_labled, item)
     
     # sort list and set it so it gets starts with the largest heights
-    print(su)
-    
     while len(unvisited_labled) > 0:
         if len(unvisited_labled) % 10000 == 0:
             print("grow labels", len(unvisited_labled), "left to go")

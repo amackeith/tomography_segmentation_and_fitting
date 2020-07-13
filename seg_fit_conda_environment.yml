@@ -4,9 +4,8 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.8
+  - python=3.6
   - tomopy
-  - nibabel
   - dipy
-prefix: /home/arthur/anaconda3/envs/seg_fit
+  - nibabel
 

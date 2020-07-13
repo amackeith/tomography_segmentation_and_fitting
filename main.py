@@ -164,28 +164,17 @@ def main():
                         help="this theresholds the blurred volume and sets "
                              "the voxels eligable to be part of the final"
                              " segments")
-    # binary thresh can be manually set here
-    threshold_of_binary = 0.7401  # 0.77 #None #0.69
-    # this is used to seperate the centers as "markers"
-    threshold_of_eroded_binary_percentile = 99.0  # 4.5
-    # this is just a blur that is used to smooth any odd discrepancies in
-    # the eculdian distance map
-    gauss_filt_sigma = 1.75
-    # this theresholds the blurred volume
-    threshold_of_edm_percentile = 92.0  # 2.0  # 1.4
-    # anything less than this volume is either incorporated into nearby stuff
-    # or thrown out
-    min_vol_for_segment = 1000
-    ###
-
+    
     args = parser.parse_args()
+    print("WARNING: the default values will not work for every particle shape\n"
+          "and tomography setup they must be adjusted to each project")
     threshold_of_binary = args.threshold_of_binary
     threshold_of_eroded_binary_percentile =\
         float(args.threshold_of_eroded_binary_percentile)
     threshold_of_edm_percentile =\
         float(args.threshold_of_edm_percentile)
     
-    fname = args.fname #file to be loaded
+    fname = args.fname
     gauss_filt_sigma = args.gauss_filt_sigma
     min_vol_for_segment = args.min_vol_for_segment
     outputfolder = os.path.expanduser(args.outputfolder)

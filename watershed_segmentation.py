@@ -524,12 +524,15 @@ class watershed_pipeline:
                                 cmap='gray', origin='lower')
                 ax[0, 1].set_title("Binary Thresh %s"
                                    % self.threshold_of_binary)
-                ax[0, 2].imshow(self.rm_holes[i], cmap='gray', origin='lower')
+                ax[0, 2].imshow(self.rm_holes[i],
+                                cmap='gray', origin='lower')
                 ax[0, 2].set_title("Remove holes")
-                ax[1, 0].imshow(self.eroded_binary[i], cmap='gray', origin='lower')
+                ax[1, 0].imshow(self.eroded_binary[i],
+                                cmap='gray', origin='lower')
                 ax[1, 0].set_title("Pre thresh on EDT")
                 ax[1, 1].imshow(self.labeled_centers[i],
-                                origin='lower', cmap=seg_cmap, interpolation='none')
+                                origin='lower',
+                                cmap=seg_cmap, interpolation='none')
                 ax[1, 1].set_title("Labeled centers, \nThresh on EDT %s"
                                    % self.threshold_of_eroded_binary_percentile)
     
@@ -543,14 +546,18 @@ class watershed_pipeline:
                                    self.threshold_of_edm_percentile)
     
                 ax[2, 1].imshow(self.segmented[i],
-                                origin='lower', cmap=seg_cmap, interpolation='none')
+                                origin='lower',
+                                cmap=seg_cmap, interpolation='none')
                 ax[2, 1].set_title("Segments")
                 ax[2, 2].imshow(self.segmented_only_big_labels[i],
-                                origin='lower', cmap=seg_cmap, interpolation='none')
+                                origin='lower',
+                                cmap=seg_cmap, interpolation='none')
                 ax[2, 2].set_title("segmented only big labels vol %s"
                                    % self.min_vol_for_segment)
                 #plt.tight_layout(h_pad=0.75)
-                print(i, "of", length_of_movie, "Making label_watershed_method video")
+                if i % 50 == 0:
+                    print(i, "of", length_of_movie,
+                          "Making label_watershed_method video")
                 # plt.tight_layout(h_pad=0.75)
                 # plt.title(paramiters, y=1.08)
                 writer.grab_frame()
@@ -559,9 +566,12 @@ class watershed_pipeline:
             c[:,0,0] = 0
         
 
-    def rand_cmap(self, nlabels, kind='bright', first_color_black=True, last_color_black=False, verbose=False):
+    def rand_cmap(self, nlabels, kind='bright',
+                  first_color_black=True,
+                  last_color_black=False, verbose=False):
         """
-        Creates a random colormap to be used together with matplotlib. Useful for segmentation tasks
+        Creates a random colormap to be used together with
+         matplotlib. Useful for segmentation tasks
         :param nlabels: Number of labels (size of colormap)
         :param kind: 'bright' for strong colors, 'soft' for pastel colors
         :param first_color_black: Option to use first color as black, True or False
@@ -586,12 +596,15 @@ class watershed_pipeline:
         if kind == 'bright':
             randHSVcolors = [(np.random.uniform(low=0.0, high=1),
                               np.random.uniform(low=0.2, high=1),
-                              np.random.uniform(low=0.9, high=1)) for i in range(nlabels)]
+                              np.random.uniform(low=0.9, high=1))
+                             for i in range(nlabels)]
         
             # Convert HSV list to RGB
             randRGBcolors = []
             for HSVcolor in randHSVcolors:
-                randRGBcolors.append(colorsys.hsv_to_rgb(HSVcolor[0], HSVcolor[1], HSVcolor[2]))
+                randRGBcolors.append(colorsys.hsv_to_rgb(HSVcolor[0],
+                                                         HSVcolor[1],
+                                                         HSVcolor[2]))
         
             if first_color_black:
                 randRGBcolors[0] = [0, 0, 0]
@@ -599,7 +612,9 @@ class watershed_pipeline:
             if last_color_black:
                 randRGBcolors[-1] = [0, 0, 0]
         
-            random_colormap = LinearSegmentedColormap.from_list('new_map', randRGBcolors, N=nlabels)
+            random_colormap = LinearSegmentedColormap.from_list('new_map',
+                                                                randRGBcolors,
+                                                                N=nlabels)
     
         # Generate soft pastel colors, by limiting the RGB spectrum
         if kind == 'soft':
@@ -607,7 +622,8 @@ class watershed_pipeline:
             high = 0.95
             randRGBcolors = [(np.random.uniform(low=low, high=high),
                               np.random.uniform(low=low, high=high),
-                              np.random.uniform(low=low, high=high)) for i in range(nlabels)]
+                              np.random.uniform(low=low, high=high))
+                             for i in range(nlabels)]
         
             if first_color_black:
                 randRGBcolors[0] = [0, 0, 0]
@@ -625,7 +641,10 @@ class watershed_pipeline:
             bounds = np.linspace(0, nlabels, nlabels + 1)
             norm = colors.BoundaryNorm(bounds, nlabels)
         
-            cb = colorbar.ColorbarBase(ax, cmap=random_colormap, norm=norm, spacing='proportional', ticks=None,
-                                       boundaries=bounds, format='%1i', orientation=u'horizontal')
+            cb = colorbar.ColorbarBase(ax, cmap=random_colormap,
+                                       norm=norm,
+                                       spacing='proportional', ticks=None,
+                                       boundaries=bounds,
+                                       format='%1i', orientation=u'horizontal')
     
         return random_colormap
