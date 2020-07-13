@@ -9,5 +9,11 @@ then activate the environment with
 conda activate seg_fit 
 
 
-In order to get the cpp
+In order to get the cpp on Linux or mac:
+cd watershedtools_cpp
+bash ./build.sh
+
+the cpp should work on windows as well, 
+but you will need to figure out how to build it
+yourself.
 

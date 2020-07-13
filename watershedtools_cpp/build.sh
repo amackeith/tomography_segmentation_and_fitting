@@ -31,5 +31,5 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 ld -bundle -flat_namespace -undefined suppress -o _watershedtools_cpp.so \
       watershedtools_cpp.o watershedtools_cpp_wrap.o
 else
-  raise error "script compile of CPP only supported on Linux and Mac OS, the python version will still work though"
+  raise error "bash script compile of CPP only supported on Linux and Mac OS, the python version will still work though"
 fi
