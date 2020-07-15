@@ -1,3 +1,4 @@
+#!/usr/bin/env conda run -n seg_fit python
 '''
 Author: Arthur Mackeith
 Date: June 28, 2020

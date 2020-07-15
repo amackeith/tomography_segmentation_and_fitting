@@ -15,7 +15,8 @@ gcc --std=c++11 -fPIC -c watershedtools_cpp.cpp
 
 swig -python -c++ -o watershedtools_cpp_wrap.cpp watershedtools_cpp.i
 
-# then compile the wrapper
+# then compile the wrapper, this step must link to the Python.h header as
+# well as the numpy header.
 # NOTE: you must have set up and activated the conda env before this step.
 gcc -std=c++11 -fPIC -c \
       -I "${CONDA_PREFIX}"/include/python3.6m \
