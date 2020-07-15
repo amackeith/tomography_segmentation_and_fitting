@@ -4,7 +4,7 @@ Since tomopy is only availible through conda-forge the most straight forward way
 this (maybe the only way) is through conda. To do this install conda and then
 in the directory you downloaded the repo to run:
 
-$ conda env create -f seg_fit_conda environment.yml
+$ conda env create -f seg_fit_conda_environment.yml
 
 then activate the environment with
 
@@ -19,8 +19,12 @@ or on linux:
 
 $ echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc
 
-In order to get the cpp on Linux or mac:
 
+Install swig:
+linux:
+sudo apt-get install swig
+
+In order to get the cpp on Linux or mac:
 $ cd watershedtools_cpp
 $ bash ./build.sh
 
