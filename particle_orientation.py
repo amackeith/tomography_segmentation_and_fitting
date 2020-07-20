@@ -196,6 +196,8 @@ class orientations_from_moment_of_inertia:
         results.extend(q.get(True))
         
         results = np.array(results)
+        
+        # see explination of positions_orientations.npy in processing()
         np.save(self.fname + "_positions_orientation.npy", results)
         print("Found ", len(results), " particles")
     
@@ -235,6 +237,46 @@ class orientations_from_moment_of_inertia:
             results.extend(q.get(True))
         
         results = np.array(results)
+        
+        # this is to explain what each entry is. Every entry in this results
+        # list is of the folowing form
+        # particle = [center_of_mass, np.array([phi, theta, 0]),
+        #             principle_axis, mask_vol, particle_index,
+        #             (val, vec), moment]
+        
+        # center of mass is the center of mass with positions coords given by
+        # the input volumes three axis.
+        # phi and theta is the orientation of the pricipal axis (axis of
+        # rotational symetry of the given particle. To find it one uses this
+        # rotation matrix:
+        '''
+        def make_rot_mat_simplified(phi, theta):
+            rotmat = np.zeros((3, 3))
+            rotmat[0, 0] = np.cos(phi)
+            rotmat[0, 1] = np.sin(phi)
+            rotmat[0, 2] = 0.
+            
+            rotmat[1, 0] = -np.cos(theta) * np.sin(phi)
+            rotmat[1, 1] = np.cos(theta) * np.cos(phi)
+            rotmat[1, 2] = np.sin(theta)
+            
+            rotmat[2, 0] = np.sin(theta) * np.sin(phi)
+            rotmat[2, 1] = -np.sin(theta) * np.cos(phi)
+            rotmat[2, 2] = np.cos(theta)
+            
+            return rotmat.T
+        '''
+        # on this kind of vector np.array([0,0,1.0]). The result of
+        # priciple_axis_from_phi_theta = np.dot(make_rot_mat_simplified(phi, theta)
+        #                                       , np.array([0,0,1.0])
+        # should be the same within a sign of priciple_axis.
+        # the phi and theta are just there for making the particles as well
+        # as shoing the orientation with the two degrees of freedom it really has
+        # mask_vol is the volume of the particular segment for this entry
+        # particle_index is the segment label in the output volume from watershed pipeline
+        # (val, vec) are the eigen values and vectors of the moment of inertia matrix
+        # which is the final entry.
+        
         np.save(self.fname + "_positions_orientation.npy", results)
         print("Found ", len(results), " particles")
         

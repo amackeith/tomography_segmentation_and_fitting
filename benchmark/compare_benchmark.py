@@ -23,8 +23,8 @@ def make_rot_mat_simplified(phi, theta):
 
 
 def test_grid():
-    true_values = np.load('../old_py/grid_lattice_la.npy', allow_pickle=True)
-    fit_values = np.load('../old_py/grid_lattice/grid_lattice_positions_orientation.npy',
+    true_values = np.load('grid_lattice_la.npy', allow_pickle=True)
+    fit_values = np.load('grid_lattice/grid_lattice_positions_orientation.npy',
                          allow_pickle=True)
     
     angle_diff = []
@@ -52,9 +52,9 @@ def test_grid():
 
 
 def test_random_orientations():
-    true_values = np.load('../old_py/grid_lattice_random_orientations_la.npy', allow_pickle=True)
+    true_values = np.load('grid_lattice_random_orientations_la.npy', allow_pickle=True)
     fit_values = np.load(
-        '../old_py/grid_lattice_random_orientations/grid_lattice_random_orientations_positions_orientation.npy',
+        'grid_lattice_random_orientations/grid_lattice_random_orientations_positions_orientation.npy',
         allow_pickle=True)
     
     angle_diff = []
@@ -84,8 +84,8 @@ def test_random_orientations():
 
 
 def test_random():
-    true_values = np.load('../old_py/grid_random_la.npy', allow_pickle=True)
-    fit_values = np.load('../old_py/grid_random/grid_random_positions_orientation.npy',
+    true_values = np.load('grid_random_la.npy', allow_pickle=True)
+    fit_values = np.load('grid_random/grid_random_positions_orientation.npy',
                          allow_pickle=True)
     
     fig, ax = plt.subplots(2)
