@@ -32,7 +32,7 @@ def test_grid():
         distance = 1000
         match = None
         for j in fit_values:
-            x = np.sum(np.abs(i[0]+200 - j[0]))
+            x = np.sum(np.abs(i[0] - j[0]))
             
             if x < distance:
                 distance = x
@@ -48,7 +48,7 @@ def test_grid():
             angle_diff.append(
                 np.rad2deg(np.arccos(np.abs(np.dot(i[2], match[2])))))
     
-    print("Matched Position of Every Test Particle")
+    print("Matched Position of Every Test Particle on lattice")
 
 
 def test_random_orientations():
@@ -80,7 +80,12 @@ def test_random_orientations():
     plt.ylabel("Count")
     plt.title("Hist angular difference between true orientation vector and fit orientation\n on Random Orientations Data")
     plt.tight_layout()
-    plt.show()
+    plt.savefig("grid_random_orientation_errors.png")
+    plt.clf()
+    print("Matched Position of Every Test Particle on lattice with random"
+          " orientations\n Max angle between true orientation vector and fit"
+          " orientation vector: ", np.max(angle_diff), " degrees")
+
 
 
 def test_random():
@@ -129,7 +134,25 @@ def test_random():
                     "orientation and fit orientation\n"
                     "on Random Orientations and position Data")
     plt.tight_layout()
-    plt.show()
+    plt.savefig("grid_random_errors.png")
+    plt.clf()
+
+    print("Matched Position of Every Test Particle on with random"
+          " position and orientations\n Max angle between true "
+          "orientation vector and fit"
+          " orientation vector: ", np.max(angle_diff), " degrees\n"
+          "Max distance between fit center of mass and true center of mass ",
+          np.max(position_diff), " voxels\n"
+          "Mean Errors with stdev:\n"
+          "Angle: ", np.mean(angle_diff), " +/- ", np.sqrt(np.var(angle_diff)),
+          "\nPosition: ", np.mean(position_diff), " +/- ",
+          np.sqrt(np.var(position_diff)),
+          "\nNote this is for BINARIZED particles with characteristic scale 25"
+          "\nvoxels and will vary for smaller and larger ones, as well as with "
+          "\nnoise and artifacts from the tomography scan process and how much "
+          "\nerosion takes place at the binirize step."
+
+          )
 
 
 def main():

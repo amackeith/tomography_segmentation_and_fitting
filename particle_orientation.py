@@ -144,15 +144,19 @@ def get_loc_and_angle(full_fitt, lbl_lst, que, core_num,
         principle_axis = vec[:, index_of_max_eigen_val]
         phi, theta = get_phi_and_theta_from_principle_axis(principle_axis)
         
-        correctd_com = com + np.array([x_avg, y_avg, z_avg]) - 2*padding  # to correct for nesting it in the empty array
+        correctd_com = com + np.array([x_avg, y_avg, z_avg]) - 2*padding
+        # to correct for nesting it in the empty array
+        
         # you need to take off 2 paddings, 1 for the padding of the whole volume
         # one for the padding of the subsection that is used when you calculate
         # the com and moment of inertia
-        lentil = [correctd_com, np.array([phi, theta, 0]), principle_axis, mask_vol, particle_index, (val, vec), moment]
+        lentil = [correctd_com, np.array([phi, theta, 0]), principle_axis,
+                  mask_vol, particle_index, (val, vec), moment]
         com_angle_list.append(lentil)
         
         if debug:
-            print("core_num", core_num, "number", cnt, "of", num, "mask vol", mask_vol)
+            print("core_num", core_num, "number", cnt,
+                  "of", num, "mask vol", mask_vol)
         cnt = cnt + 1
     
     que.put(com_angle_list)
@@ -239,15 +243,15 @@ class orientations_from_moment_of_inertia:
         results = np.array(results)
         
         # this is to explain what each entry is. Every entry in this results
-        # list is of the folowing form
+        # list is of the following form
         # particle = [center_of_mass, np.array([phi, theta, 0]),
         #             principle_axis, mask_vol, particle_index,
         #             (val, vec), moment]
         
         # center of mass is the center of mass with positions coords given by
         # the input volumes three axis.
-        # phi and theta is the orientation of the pricipal axis (axis of
-        # rotational symetry of the given particle. To find it one uses this
+        # phi and theta is the orientation of the principle axis (axis of
+        # rotational symmetry of the given particle. To find it one uses this
         # rotation matrix:
         '''
         def make_rot_mat_simplified(phi, theta):
@@ -264,14 +268,16 @@ class orientations_from_moment_of_inertia:
             rotmat[2, 1] = -np.sin(theta) * np.cos(phi)
             rotmat[2, 2] = np.cos(theta)
             
-            return rotmat.T
+            return rotmat
         '''
         # on this kind of vector np.array([0,0,1.0]). The result of
-        # priciple_axis_from_phi_theta = np.dot(make_rot_mat_simplified(phi, theta)
-        #                                       , np.array([0,0,1.0])
-        # should be the same within a sign of priciple_axis.
+        # principle_axis_from_phi_theta = np.dot(
+        #                       make_rot_mat_simplified(phi, theta).T,
+        #                       np.array([0,0,1.0])
+        #### NOTE THE TRANSPOSE
+        # should be the same within a sign of principle_axis.
         # the phi and theta are just there for making the particles as well
-        # as shoing the orientation with the two degrees of freedom it really has
+        # as showing the orientation with the two degrees of freedom it really has
         # mask_vol is the volume of the particular segment for this entry
         # particle_index is the segment label in the output volume from watershed pipeline
         # (val, vec) are the eigen values and vectors of the moment of inertia matrix

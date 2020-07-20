@@ -346,9 +346,11 @@ class watershed_pipeline:
                     self.segmented_only_big_labels[mask] = 0
                     cnt = cnt + 1
 
+            
+            print("num lables removed", cnt)
+
         print("finished masking small labels, "
               "starting grow labels for second time")
-        print("num lables removed", cnt)
         if cpp_enabled:
             # done array is an array used inside grow_labels_initerface
             # I just initiliaze it out here.
@@ -421,7 +423,6 @@ class watershed_pipeline:
             
             cnt += 1
             
-        
         finally:
             return cnt == 9, cnt
         

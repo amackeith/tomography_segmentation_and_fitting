@@ -115,6 +115,7 @@ def watershed_phase(volume, fname, threshold_of_binary, gauss_filt_sigma,
 def center_of_mass_and_orientation_from_segment(fname, volume, padding=30,
                                                 oblate=True, debug=True,
                                                 force_sequential=False):
+    print("Calculating Center of Mass and Orientations from segments")
     part_orient = particle_orientation.orientations_from_moment_of_inertia(
         fname, volume, padding, oblate, debug, force_sequential=force_sequential)
     
