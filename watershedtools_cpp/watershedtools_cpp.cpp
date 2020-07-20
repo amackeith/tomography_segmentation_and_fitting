@@ -578,25 +578,25 @@ void calculate_moment_of_inertia(int *in_arr,
         for (int j = 0; j < ymax; j++) {
             for (int k = 0; k < zmax; k++) {
                 if (in_arr[i * ymax * zmax + j * zmax + k] == 1){
-                    int x, y, z;
+                    double x, y, z;
                     x = i - x_center_of_mass;
                     y = j - y_cneter_of_mass;
                     z = k - z_center_of_mass;
 
-                    moment_of_inertia[2*0 + 0] = moment_of_inertia[2*0 + 0] + pow(y, 2) + pow(z, 2); //I_xx
-                    moment_of_inertia[2*1 + 1] = moment_of_inertia[2*1 + 1] + pow(x, 2) + pow(z, 2); // I_yy
-                    moment_of_inertia[2*2 + 2] = moment_of_inertia[2*2 + 2] + pow(x, 2) + pow(y, 2); //I_zz
-                    moment_of_inertia[2*0 + 1] = moment_of_inertia[2*0 + 1] - x * y; //I_xy
-                    moment_of_inertia[2*1 + 2] = moment_of_inertia[2*1 + 2] - y * z; //I_yz
-                    moment_of_inertia[2*0 + 2] = moment_of_inertia[2*0 + 2] - x * z; //I_zx
+                    moment_of_inertia[3*0 + 0] = moment_of_inertia[3*0 + 0] + pow(y, 2) + pow(z, 2); //I_xx
+                    moment_of_inertia[3*1 + 1] = moment_of_inertia[3*1 + 1] + pow(x, 2) + pow(z, 2); // I_yy
+                    moment_of_inertia[3*2 + 2] = moment_of_inertia[3*2 + 2] + pow(x, 2) + pow(y, 2); //I_zz
+                    moment_of_inertia[3*0 + 1] = moment_of_inertia[3*0 + 1] - x * y; //I_xy
+                    moment_of_inertia[3*1 + 2] = moment_of_inertia[3*1 + 2] - y * z; //I_yz
+                    moment_of_inertia[3*0 + 2] = moment_of_inertia[3*0 + 2] - x * z; //I_zx
 
                 }
             }
         }
     }
-    moment_of_inertia[2*1 + 0] = moment_of_inertia[2*0 + 1]; //I_yx
-    moment_of_inertia[2*2 + 1] = moment_of_inertia[2*1 + 2]; //I_zy
-    moment_of_inertia[2*2 + 0] = moment_of_inertia[2*0 + 2]; //I_zx
+    moment_of_inertia[3*1 + 0] = moment_of_inertia[3*0 + 1]; //I_yx
+    moment_of_inertia[3*2 + 1] = moment_of_inertia[3*1 + 2]; //I_zy
+    moment_of_inertia[3*2 + 0] = moment_of_inertia[3*0 + 2]; //I_zx
 }
 
 void center_of_mass(int *in_arr,

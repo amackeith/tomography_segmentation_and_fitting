@@ -29,14 +29,16 @@ def find_principal_axis(in_arr):
     # com will be used as origin
     
     moment_of_inertia = np.zeros((3, 3)) * 1.0
+    com = np.zeros(3) * 1.0
     
     if cpp_enabled:
-        com = np.zeros(3) * 1.0
+        
         watershedtools_cpp.center_of_mass(arr, com)
         
         watershedtools_cpp.calculate_moment_of_inertia(in_arr,
                                                        moment_of_inertia,
                                                        com[0], com[1], com[2])
+
     else:
         com = np.array(ndi.measurements.center_of_mass(arr))
         shp = in_arr.shape
@@ -62,7 +64,9 @@ def find_principal_axis(in_arr):
         moment_of_inertia[1, 0] = moment_of_inertia[0, 1]  # I_yx
         moment_of_inertia[2, 1] = moment_of_inertia[1, 2]  # I_zy
         moment_of_inertia[2, 0] = moment_of_inertia[0, 2]  # I_zx
-        #
+        
+
+
     # such that eigen_values[i] is the ith Eval,
     # eigen_vectors[:,i] is the coresponding eigen vector
     eigen_values, eigen_vectors = np.linalg.eig(moment_of_inertia)
@@ -75,7 +79,7 @@ def find_principal_axis(in_arr):
     # proof
     # print "should be zero", np.linalg.det(moment_of_inertia-ident*eigen_values[0]),np.linalg.det(moment_of_inertia-ident*eigen_values[1]),np.linalg.det(moment_of_inertia-ident*eigen_values[2])
     # print moment_of_inertia
-    return eigen_values, eigen_vectors, com
+    return eigen_values, eigen_vectors, com, moment_of_inertia
 
 
 def get_phi_and_theta_from_principle_axis(pi_vec):
@@ -130,7 +134,7 @@ def get_loc_and_angle(full_fitt, lbl_lst, que, core_num,
               z_avg - padding:z_avg + padding]
         arr = np.ascontiguousarray(arr, dtype=np.int32)
         
-        val, vec, com = find_principal_axis(arr)
+        val, vec, com, moment = find_principal_axis(arr)
         
         if oblate:  # particles are oblate
             index_of_max_eigen_val = np.argmax(val)
@@ -140,9 +144,11 @@ def get_loc_and_angle(full_fitt, lbl_lst, que, core_num,
         principle_axis = vec[:, index_of_max_eigen_val]
         phi, theta = get_phi_and_theta_from_principle_axis(principle_axis)
         
-        correctd_com = com - padding  # to correct for nesting it in the empty array
-        
-        lentil = [correctd_com, np.array([phi, theta, 0]), principle_axis, mask_vol, particle_index, (val, vec)]
+        correctd_com = com + np.array([x_avg, y_avg, z_avg]) - 2*padding  # to correct for nesting it in the empty array
+        # you need to take off 2 paddings, 1 for the padding of the whole volume
+        # one for the padding of the subsection that is used when you calculate
+        # the com and moment of inertia
+        lentil = [correctd_com, np.array([phi, theta, 0]), principle_axis, mask_vol, particle_index, (val, vec), moment]
         com_angle_list.append(lentil)
         
         if debug:

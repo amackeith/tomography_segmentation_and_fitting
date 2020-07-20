@@ -203,7 +203,9 @@ class watershed_pipeline:
         min_p, max_p = \
             scoreatpercentile(self.eroded_binary,
                               (self.threshold_of_eroded_binary_percentile, 99.5))
-        self.eroded_binary_thresh = np.int8((self.eroded_binary > min_p) * 1)
+
+        self.eroded_binary_thresh = np.int8((self.eroded_binary > 4.5) * 1)
+        # test_exact self.eroded_binary_thresh = np.int8((self.eroded_binary > min_p) * 1)
         # using this threshheld map find the
         # centers which should all be separated from eachother
         
@@ -253,9 +255,11 @@ class watershed_pipeline:
         min_p, max_p = \
             scoreatpercentile(self.edm_of_ellipsiod_phase,
                               (self.threshold_of_edm_percentile, 99.5))
+        # self.edm_of_ellipsiod_phase[
+        #             self.edm_of_ellipsiod_phase < min_p] = 0
+        #test_exact
         self.edm_of_ellipsiod_phase[
-            self.edm_of_ellipsiod_phase < min_p] = 0
-        
+            self.edm_of_ellipsiod_phase < 2.0] = 0
         if self.debug:
             np.save(self.fname + "_edm_blur_threshold.npy",
                     self.edm_of_ellipsiod_phase)
@@ -426,17 +430,17 @@ class watershed_pipeline:
         #this is to make the color map consistent accross slices
         ones_with_color = [self.labeled_centers, self.segmented, self.segmented_only_big_labels]
         for c in ones_with_color:
-            c[:, 0, 0] = self.num_lentils_found
+            c[:, 0, 0] = 10000
             
-        colors = self.rand_cmap(self.num_lentils_found, verbose=False)
+        colors = self.rand_cmap(10000, verbose=False)
         seg_cmap = colors
         
         ## this section (at the cost of 1 bad px makes the color
         # maps consistent from shot to shot
         # so this step should only be done after saving
-        self.labeled_centers[:,0,0] = self.num_lentils_found
-        self.segmented[:, 0, 0] = self.num_lentils_found
-        self.segmented_only_big_labels[:, 0, 0] = self.num_lentils_found
+        self.labeled_centers[:,0,0] = 10000
+        self.segmented[:, 0, 0] = 10000
+        self.segmented_only_big_labels[:, 0, 0] = 10000
 
         length_of_movie = self.segmented_only_big_labels.shape[0]
         
@@ -492,9 +496,9 @@ class watershed_pipeline:
         # this is to make the color map consistent accross slices
         ones_with_color = [self.labeled_centers, self.segmented, self.segmented_only_big_labels]
         for c in ones_with_color:
-            c[:, 0, 0] = self.num_lentils_found
+            c[:, 0, 0] = 10000
         
-        colors = self.rand_cmap(self.num_lentils_found, verbose=False)
+        colors = self.rand_cmap(10000, verbose=False)
         seg_cmap = colors
         FFMpegWriter = animation.writers['ffmpeg']
         
@@ -582,7 +586,7 @@ class watershed_pipeline:
         from matplotlib.colors import LinearSegmentedColormap
         import colorsys
         import numpy as np
-    
+        
         np.random.seed(100)
     
         if kind not in ('bright', 'soft'):

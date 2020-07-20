@@ -6,7 +6,8 @@ in the directory you downloaded the repo to run:
 
 $ conda env create -f seg_fit_conda_environment.yml
 
-then activate the environment with
+then activate the environment with (note this env must be active when you call
+tomography_segment_and_fit.py from the command line in other directories)
 
 $ conda activate seg_fit
 
@@ -32,6 +33,7 @@ the cpp should work on windows as well,
 but you will need to figure out how to build it
 yourself.
 
-now you should be able to run this with:
+now you should be able to run this with (where input_file.npy) is in that directory.
 
-$ tomography_segment_and_fit.py -i input_file.npy -o output_folder -other_options
+$ tomography_segment_and_fit.py -i input_file.npy -o /path/to/output_folder
+> -other_options
