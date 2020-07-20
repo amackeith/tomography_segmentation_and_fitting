@@ -78,7 +78,7 @@ def test_random_orientations():
     plt.hist(angle_diff, bins=30)
     plt.xlabel("Degrees")
     plt.ylabel("Count")
-    plt.title("Hist angular difference between true orientation and fit orientation\n on Random Orientations Data")
+    plt.title("Hist angular difference between true orientation vector and fit orientation\n on Random Orientations Data")
     plt.tight_layout()
     plt.show()
 

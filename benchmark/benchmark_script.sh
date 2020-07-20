@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-python create_volume.py
+python create_benchmark_volumes.py
 
 tomography_segment_and_fit.py -i grid_lattice.npy -o grid_lattice -de_noised_volume -b 0.5
 
