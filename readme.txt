@@ -16,8 +16,9 @@ tomography_segment_and_fit.py from the command line in other directories)
 
 $ conda activate seg_fit
 
+
 to add tomography_segment_and_fit.py to the path:
-on mac:
+On OS X:
 
 $ echo "export PATH=\$PATH:$(pwd)" >> ~/.bash_profile
 
