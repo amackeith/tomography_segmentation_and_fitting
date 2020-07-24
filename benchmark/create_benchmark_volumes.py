@@ -5,13 +5,27 @@ import multiprocessing as mp
 import numpy as np
 import scipy.ndimage as ndi
 
-radius = 25.0
+#length scale for lens/lentil particles
+radius = 23.0
+
+# the errors will increase with smaller particle size as
+# discretization error increases
+
+# success is observed for radius=25.0
+# and default arguments (0.5 binary threshold)
+
+# Failure is observed when radius=21.0 if used with standard values
+# (segments are dropped)
+
 angle = 45.0
 # angle of lentils
 eta = np.deg2rad(angle)
-padding = 200  ## voxels on each side of xy
+padding = 200  # voxels on each side of xy
 # making lentil array functions
+
+#spacing of particles within volume
 spacer = int(radius * 1.75)
+
 
 xvals, yvals, zvals = np.meshgrid(range(2 * padding), range(2 * padding), range(2 * padding), indexing="ij")
 
@@ -48,7 +62,7 @@ def place_lentil(in_arr, params):
     # do the rotation first, so that the points start out at (0,0,+- r sqrt2 / 2), then rotate according to
     rot_mat = make_rot_mat_simplified(phi, theta).T
     
-    r = (radius) * np.cos(eta)  # np.sqrt(2.0)/2.0
+    r = radius * np.cos(eta)  # np.sqrt(2.0)/2.0
     
     norm = np.float32([0, 0, 1])
     sphere1 = np.float32([0, 0, r])
@@ -58,13 +72,14 @@ def place_lentil(in_arr, params):
     sphere1 = np.dot(rot_mat, sphere1)
     sphere2 = np.dot(rot_mat, sphere2)
     
-    on_vox = (((xvals - cenx - x - sphere1[0]) ** 2 + (yvals - ceny - y - sphere1[1]) ** 2 + (
-            zvals - cenz - z - sphere1[2]) ** 2) < radius ** 2) & \
-             (((xvals - cenx - x - sphere2[0]) ** 2 + (yvals - ceny - y - sphere2[1]) ** 2 + (
-                     zvals - cenz - z - sphere2[2]) ** 2) < radius ** 2)
+    on_vox = (((xvals - cenx - x - sphere1[0]) ** 2
+               + (yvals - ceny - y - sphere1[1]) ** 2
+               + (zvals - cenz - z - sphere1[2]) ** 2) < radius ** 2) & \
+             (((xvals - cenx - x - sphere2[0]) ** 2
+               + (yvals - ceny - y - sphere2[1]) ** 2
+               + (zvals - cenz - z - sphere2[2]) ** 2) < radius ** 2)
     
     in_arr[on_vox] = 1
-    
     return in_arr, norm
 
 
@@ -74,22 +89,19 @@ def grid_lattice():
     list_of_loc_angle = []
     output_array = np.zeros((2 * padding, 2 * padding, 2 * padding))
     
-    for i in range(-3,4):
+    for i in range(-3, 4):
         print('grid lattice', i)
         for j in range(-3, 4):
             for k in range(-3, 4):
                 # print(i, j, k)
                 _, norm = place_lentil(output_array,
-                                [i * spacer, j * spacer, k * spacer, 0, 0])
+                                       [i * spacer, j * spacer, k * spacer, 0, 0])
                 list_of_loc_angle.append(
                     np.array([
-                        np.array([i * spacer, j * spacer, k * spacer])+padding,
+                        np.array([i * spacer, j * spacer, k * spacer]) + padding,
                         np.array([0, 0, 0]), norm]))
-                
-
+    
     return output_array, np.array(list_of_loc_angle)
-
-
 
 
 def grid_lattice_random_orientations():
@@ -106,7 +118,6 @@ def grid_lattice_random_orientations():
                 b = np.random.random()
                 phi = 2 * np.pi * a
                 theta = np.arccos(2 * b - 1)
-                
                 
                 _, norm = place_lentil(output_array,
                                        [i * spacer, j * spacer, k * spacer, phi, theta])
@@ -182,8 +193,6 @@ def main():
     y.start()
     z = Process(target=make_random, args=(q,))
     z.start()
-    
-    
     
     x.join()
     y.join()

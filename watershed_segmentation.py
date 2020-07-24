@@ -204,8 +204,7 @@ class watershed_pipeline:
             scoreatpercentile(self.eroded_binary,
                               (self.threshold_of_eroded_binary_percentile, 99.5))
 
-        self.eroded_binary_thresh = np.int8((self.eroded_binary > 4.5) * 1)
-        # test_exact self.eroded_binary_thresh = np.int8((self.eroded_binary > min_p) * 1)
+        self.eroded_binary_thresh = np.int8((self.eroded_binary > min_p) * 1)
         # using this threshheld map find the
         # centers which should all be separated from eachother
         
@@ -255,9 +254,9 @@ class watershed_pipeline:
         min_p, max_p = \
             scoreatpercentile(self.edm_of_ellipsiod_phase,
                               (self.threshold_of_edm_percentile, 99.5))
-        # self.edm_of_ellipsiod_phase[
-        #             self.edm_of_ellipsiod_phase < min_p] = 0
-        #test_exact
+        self.edm_of_ellipsiod_phase[
+                    self.edm_of_ellipsiod_phase < min_p] = 0
+        
         self.edm_of_ellipsiod_phase[
             self.edm_of_ellipsiod_phase < 2.0] = 0
         if self.debug:

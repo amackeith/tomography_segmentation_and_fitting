@@ -24,7 +24,7 @@ def make_rot_mat_simplified(phi, theta):
 
 def test_grid():
     true_values = np.load('grid_lattice_la.npy', allow_pickle=True)
-    fit_values = np.load('grid_lattice/grid_lattice_positions_orientation.npy',
+    fit_values = np.load('grid_lattice/grid_lattice0.5_positions_orientation.npy',
                          allow_pickle=True)
     
     angle_diff = []
@@ -42,19 +42,23 @@ def test_grid():
             print("Failed to match every test particle", distance)
             print(i)
             print(match)
-            exit()
+            
             
         else:
             angle_diff.append(
                 np.rad2deg(np.arccos(np.abs(np.dot(i[2], match[2])))))
     
-    print("Matched Position of Every Test Particle on lattice")
+    if len(angle_diff) != len(true_values):
+        print("grid lattice FAILED, did not match this many particles: ",
+              len(true_values) - len(angle_diff))
+    else:
+        print("Matched Position of Every Test Particle on lattice")
 
 
 def test_random_orientations():
     true_values = np.load('grid_lattice_random_orientations_la.npy', allow_pickle=True)
     fit_values = np.load(
-        'grid_lattice_random_orientations/grid_lattice_random_orientations_positions_orientation.npy',
+        'grid_lattice_random_orientations/grid_lattice_random_orientations0.5_positions_orientation.npy',
         allow_pickle=True)
     
     angle_diff = []
@@ -70,10 +74,17 @@ def test_random_orientations():
         
         if distance != 0:
             print("Failed to match every test particle", distance)
-            exit()
+            
         else:
             angle_diff.append(
                 np.rad2deg(np.arccos(np.abs(np.dot(i[2], match[2])))))
+            
+
+    if len(angle_diff) != len(true_values):
+        print("random orientation FAILED, did not match this many particles: ",
+              len(true_values) - len(angle_diff))
+        exit()
+    
     
     plt.hist(angle_diff, bins=30)
     plt.xlabel("Degrees")
@@ -88,10 +99,11 @@ def test_random_orientations():
 
 
 
-def test_random():
-    true_values = np.load('grid_random_la.npy', allow_pickle=True)
-    fit_values = np.load('grid_random/grid_random_positions_orientation.npy',
-                         allow_pickle=True)
+def test_random(tv_fname='grid_random_la.npy',
+                fit_name='grid_random/grid_random0.5_positions_orientation.npy'
+                ):
+    true_values = np.load(tv_fname, allow_pickle=True)
+    fit_values = np.load(fit_name, allow_pickle=True)
     
     fig, ax = plt.subplots(2)
     position_diff = []
@@ -99,7 +111,7 @@ def test_random():
     
     for i in true_values:
         distance = 1000
-        match = None
+        match = [None]
         for j in fit_values:
             x = np.sum(np.abs(i[0] - j[0]))
             
@@ -109,16 +121,16 @@ def test_random():
         
         position_diff.append(distance)
         
-        if distance > 0.2:
+        if distance > 10:
+            print("Likely did not match all particles", distance)
+    
             print(i[0])
             print()
             print(match[0])
-            print("Failed to match every test particle", distance)
-            exit()
         else:
             angle_diff.append(
                 np.rad2deg(np.arccos(np.abs(np.dot(i[2], match[2])))))
-    
+
     ax[0].hist(position_diff, bins=30)
     ax[0].set_xlabel("Voxels")
     ax[0].set_ylabel("Count")

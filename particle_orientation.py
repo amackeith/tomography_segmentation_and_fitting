@@ -166,7 +166,7 @@ class orientations_from_moment_of_inertia:
     
     def __init__(self, fname, segmented_volume, padding=30,
                  oblate=True, debug=False, force_sequential=False,
-                 specify_max_cores=0):
+                 specify_max_cores=0, threshold_of_binary=''):
         self.fname = fname[:-4]
         self.volume = np.int32(segmented_volume)
         self.padding = padding
@@ -174,6 +174,7 @@ class orientations_from_moment_of_inertia:
         self.debug = debug
         self.force_sequential = force_sequential
         self.specify_max_cores = specify_max_cores
+        self.threshold_of_binary = threshold_of_binary
         
         # inset the volume with #padding voxels in each direction
         shp = np.array(self.volume.shape) + 2 * padding
@@ -202,7 +203,8 @@ class orientations_from_moment_of_inertia:
         results = np.array(results)
         
         # see explination of positions_orientations.npy in processing()
-        np.save(self.fname + "_positions_orientation.npy", results)
+        np.save(self.fname + self.threshold_of_binary +
+                "_positions_orientation.npy", results)
         print("Found ", len(results), " particles")
     
     def processing(self):
@@ -283,7 +285,8 @@ class orientations_from_moment_of_inertia:
         # (val, vec) are the eigen values and vectors of the moment of inertia matrix
         # which is the final entry.
         
-        np.save(self.fname + "_positions_orientation.npy", results)
+        np.save(self.fname + self.threshold_of_binary +
+                "_positions_orientation.npy", results)
         print("Found ", len(results), " particles")
         
         for i in range(system_cores):

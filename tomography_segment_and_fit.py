@@ -92,6 +92,7 @@ def watershed_phase(volume, fname, threshold_of_binary, gauss_filt_sigma,
     # exit()
     ####
     s = time.time()
+
     print("one: Binirize")
     wsp.binirize()
     print("two: Remove holes")
@@ -106,7 +107,7 @@ def watershed_phase(volume, fname, threshold_of_binary, gauss_filt_sigma,
     wsp.remove_small_labels()
     print("TOTAL TIME ON WATERSHED", (time.time() - s) / 60, " Minutes")
     print("seven: Create Display")
-    # wsp.display_standard_step_through()
+    # wsp.display_standard_step_through(10)
     wsp.display_movie()
     
     return wsp.segmented_only_big_labels
@@ -114,10 +115,13 @@ def watershed_phase(volume, fname, threshold_of_binary, gauss_filt_sigma,
 
 def center_of_mass_and_orientation_from_segment(fname, volume, padding=30,
                                                 oblate=True, debug=True,
-                                                force_sequential=False):
+                                                force_sequential=False,
+                                                threshold_of_binary=''):
     print("Calculating Center of Mass and Orientations from segments")
     part_orient = particle_orientation.orientations_from_moment_of_inertia(
-        fname, volume, padding, oblate, debug, force_sequential=force_sequential)
+        fname, volume, padding, oblate, debug,
+        force_sequential=force_sequential,
+        threshold_of_binary=threshold_of_binary)
     
     part_orient.processing()
 
@@ -232,11 +236,13 @@ def main():
                                        min_vol_for_segment,
                                        debug)
     
-    center_of_mass_and_orientation_from_segment(outputfolder + fname,
-                                                segmented_volume,
-                                                padding=30, oblate=oblate,
-                                                debug=debug)
-    
+    center_of_mass_and_orientation_from_segment(
+        outputfolder + fname,
+        segmented_volume,
+        padding=30, oblate=oblate,
+        debug=debug,
+        threshold_of_binary=str(threshold_of_binary))
+
     print("Total time: ", (time.time() - time_start) / 60, " minutes")
 
 

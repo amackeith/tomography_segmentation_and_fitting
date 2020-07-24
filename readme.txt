@@ -49,6 +49,8 @@ the cpp should work on windows as well,
 but you will need to figure out how to build it
 yourself.
 
+##################################
+
 now you should be able to run this with (where input_file.npy) is in that directory.
 
 $ tomography_segment_and_fit.py -i input_file.npy -o /path/to/output_folder -other_options
