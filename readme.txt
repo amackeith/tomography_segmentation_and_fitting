@@ -1,15 +1,5 @@
-<<<<<<< HEAD
 This software is for segmentation and fitting of 3D density data from
 tomographic scans of pickings of spheriods.
-
-Use:
-This takes in a tomography as input and outputs a list of
-=======
-About:
-This software was written to segment (and fit for position and orientation)
- tomography scans of granular samples of spheroids.
-
->>>>>>> 29c5fe6014e03d456f5e3c80219d03b5afec2f9e
 
 Start by installing python dependencies.
 
