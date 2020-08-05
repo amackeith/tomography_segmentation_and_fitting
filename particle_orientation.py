@@ -29,14 +29,16 @@ def find_principal_axis(in_arr):
     # com will be used as origin
     
     moment_of_inertia = np.zeros((3, 3)) * 1.0
+    com = np.zeros(3) * 1.0
     
     if cpp_enabled:
-        com = np.zeros(3) * 1.0
+        
         watershedtools_cpp.center_of_mass(arr, com)
         
         watershedtools_cpp.calculate_moment_of_inertia(in_arr,
                                                        moment_of_inertia,
                                                        com[0], com[1], com[2])
+
     else:
         com = np.array(ndi.measurements.center_of_mass(arr))
         shp = in_arr.shape
@@ -62,7 +64,9 @@ def find_principal_axis(in_arr):
         moment_of_inertia[1, 0] = moment_of_inertia[0, 1]  # I_yx
         moment_of_inertia[2, 1] = moment_of_inertia[1, 2]  # I_zy
         moment_of_inertia[2, 0] = moment_of_inertia[0, 2]  # I_zx
-        #
+        
+
+
     # such that eigen_values[i] is the ith Eval,
     # eigen_vectors[:,i] is the coresponding eigen vector
     eigen_values, eigen_vectors = np.linalg.eig(moment_of_inertia)
@@ -75,7 +79,7 @@ def find_principal_axis(in_arr):
     # proof
     # print "should be zero", np.linalg.det(moment_of_inertia-ident*eigen_values[0]),np.linalg.det(moment_of_inertia-ident*eigen_values[1]),np.linalg.det(moment_of_inertia-ident*eigen_values[2])
     # print moment_of_inertia
-    return eigen_values, eigen_vectors, com
+    return eigen_values, eigen_vectors, com, moment_of_inertia
 
 
 def get_phi_and_theta_from_principle_axis(pi_vec):
@@ -130,7 +134,7 @@ def get_loc_and_angle(full_fitt, lbl_lst, que, core_num,
               z_avg - padding:z_avg + padding]
         arr = np.ascontiguousarray(arr, dtype=np.int32)
         
-        val, vec, com = find_principal_axis(arr)
+        val, vec, com, moment = find_principal_axis(arr)
         
         if oblate:  # particles are oblate
             index_of_max_eigen_val = np.argmax(val)
@@ -140,13 +144,19 @@ def get_loc_and_angle(full_fitt, lbl_lst, que, core_num,
         principle_axis = vec[:, index_of_max_eigen_val]
         phi, theta = get_phi_and_theta_from_principle_axis(principle_axis)
         
-        correctd_com = com - padding  # to correct for nesting it in the empty array
+        correctd_com = com + np.array([x_avg, y_avg, z_avg]) - 2*padding
+        # to correct for nesting it in the empty array
         
-        lentil = [correctd_com, np.array([phi, theta, 0]), principle_axis, mask_vol, particle_index, (val, vec)]
+        # you need to take off 2 paddings, 1 for the padding of the whole volume
+        # one for the padding of the subsection that is used when you calculate
+        # the com and moment of inertia
+        lentil = [correctd_com, np.array([phi, theta, 0]), principle_axis,
+                  mask_vol, particle_index, (val, vec), moment]
         com_angle_list.append(lentil)
         
         if debug:
-            print("core_num", core_num, "number", cnt, "of", num, "mask vol", mask_vol)
+            print("core_num", core_num, "number", cnt,
+                  "of", num, "mask vol", mask_vol)
         cnt = cnt + 1
     
     que.put(com_angle_list)
@@ -156,7 +166,7 @@ class orientations_from_moment_of_inertia:
     
     def __init__(self, fname, segmented_volume, padding=30,
                  oblate=True, debug=False, force_sequential=False,
-                 specify_max_cores=0):
+                 specify_max_cores=0, threshold_of_binary=''):
         self.fname = fname[:-4]
         self.volume = np.int32(segmented_volume)
         self.padding = padding
@@ -164,6 +174,7 @@ class orientations_from_moment_of_inertia:
         self.debug = debug
         self.force_sequential = force_sequential
         self.specify_max_cores = specify_max_cores
+        self.threshold_of_binary = threshold_of_binary
         
         # inset the volume with #padding voxels in each direction
         shp = np.array(self.volume.shape) + 2 * padding
@@ -190,7 +201,10 @@ class orientations_from_moment_of_inertia:
         results.extend(q.get(True))
         
         results = np.array(results)
-        np.save(self.fname + "_positions_orientation.npy", results)
+        
+        # see explination of positions_orientations.npy in processing()
+        np.save(self.fname + self.threshold_of_binary +
+                "_positions_orientation.npy", results)
         print("Found ", len(results), " particles")
     
     def processing(self):
@@ -229,7 +243,50 @@ class orientations_from_moment_of_inertia:
             results.extend(q.get(True))
         
         results = np.array(results)
-        np.save(self.fname + "_positions_orientation.npy", results)
+        
+        # this is to explain what each entry is. Every entry in this results
+        # list is of the following form
+        # particle = [center_of_mass, np.array([phi, theta, 0]),
+        #             principle_axis, mask_vol, particle_index,
+        #             (val, vec), moment]
+        
+        # center of mass is the center of mass with positions coords given by
+        # the input volumes three axis.
+        # phi and theta is the orientation of the principle axis (axis of
+        # rotational symmetry of the given particle. To find it one uses this
+        # rotation matrix:
+        '''
+        def make_rot_mat_simplified(phi, theta):
+            rotmat = np.zeros((3, 3))
+            rotmat[0, 0] = np.cos(phi)
+            rotmat[0, 1] = np.sin(phi)
+            rotmat[0, 2] = 0.
+            
+            rotmat[1, 0] = -np.cos(theta) * np.sin(phi)
+            rotmat[1, 1] = np.cos(theta) * np.cos(phi)
+            rotmat[1, 2] = np.sin(theta)
+            
+            rotmat[2, 0] = np.sin(theta) * np.sin(phi)
+            rotmat[2, 1] = -np.sin(theta) * np.cos(phi)
+            rotmat[2, 2] = np.cos(theta)
+            
+            return rotmat
+        '''
+        # on this kind of vector np.array([0,0,1.0]). The result of
+        # principle_axis_from_phi_theta = np.dot(
+        #                       make_rot_mat_simplified(phi, theta).T,
+        #                       np.array([0,0,1.0])
+        #### NOTE THE TRANSPOSE
+        # should be the same within a sign of principle_axis.
+        # the phi and theta are just there for making the particles as well
+        # as showing the orientation with the two degrees of freedom it really has
+        # mask_vol is the volume of the particular segment for this entry
+        # particle_index is the segment label in the output volume from watershed pipeline
+        # (val, vec) are the eigen values and vectors of the moment of inertia matrix
+        # which is the final entry.
+        
+        np.save(self.fname + self.threshold_of_binary +
+                "_positions_orientation.npy", results)
         print("Found ", len(results), " particles")
         
         for i in range(system_cores):
