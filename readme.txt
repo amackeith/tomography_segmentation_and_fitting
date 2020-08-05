@@ -1,3 +1,9 @@
+This software is for segmentation and fitting of 3D density data from
+tomographic scans of pickings of spheriods.
+
+Use:
+This takes in a tomography as input and outputs a list of
+
 Start by installing python dependencies.
 
 Since tomopy is only availible through conda-forge the most straight forward way to do
