@@ -583,6 +583,8 @@ class watershed_pipeline:
         :param verbose: Prints the number of labels and shows the colormap. True or False
         :return: colormap for matplotlib
         """
+        
+        # this function from  https://github.com/delestro/rand_cmap
         from matplotlib.colors import LinearSegmentedColormap
         import colorsys
         import numpy as np
