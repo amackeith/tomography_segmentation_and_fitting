@@ -193,7 +193,8 @@ def main():
     y.start()
     z = Process(target=make_random, args=(q,))
     z.start()
-    
+    for i in range(3):
+        q.get() 
     x.join()
     y.join()
     z.join()
