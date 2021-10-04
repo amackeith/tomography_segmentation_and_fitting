@@ -24,6 +24,9 @@ or on linux:
 
 $ echo "export PATH=\$PATH:$(pwd)" >> ~/.bashrc
 
+(note for this to take effect you must either source the bash profile which
+can be done by loging in again in the terminal or opening a new terminal window
+and working from there)
 
 ##################################
 CPP acceleration
