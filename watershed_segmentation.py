@@ -369,7 +369,7 @@ class watershed_pipeline:
         lbls = list(set(lbls))
         lbls.sort()
         self.num_lentils_found = len(lbls) - 1
-        print(self.num_lentils_found)
+        print('Second pass, number particles found', self.num_lentils_found)
         
         if self.use_better_labels:
             self.segmented_only_big_labels = \

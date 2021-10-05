@@ -242,7 +242,7 @@ class orientations_from_moment_of_inertia:
         for i in range(system_cores):
             results.extend(q.get(True))
         
-        results = np.array(results)
+        results = np.array(results, dtype=object)
         
         # this is to explain what each entry is. Every entry in this results
         # list is of the following form
