@@ -188,6 +188,13 @@ def main():
     parser.add_argument('-de_noised_volume', dest='de_noised_volume',
                         action='store_true',
                         help="skip de noising and use fname this volume instead")
+
+    parser.add_argument('-binary_volume', dest='binary_volume',
+                        action='store_true',
+                        help="The input volume is already binary skip de "
+                             "noising and use fname this volume instead "
+                             "(i.e. binary implies denoised) "
+                             "set threshold_of_binary to 0.5 if not otherwise specified")
     
     args = parser.parse_args()
     print("WARNING: the default values will not work for every particle shape\n"
@@ -211,6 +218,7 @@ def main():
     debug = args.debug
     oblate = not args.prolate
     de_noised_volume = args.de_noised_volume
+    binary_volume = args.binary_volume
 
     watershed_params = (threshold_of_binary,
                         threshold_of_eroded_binary_percentile,
@@ -219,6 +227,11 @@ def main():
                         min_vol_for_segment)
     
     time_start = time.time()
+
+    if binary_volume:
+        de_noised_volume = True # binary implies denoised
+        if (None == threshold_of_binary):
+            threshold_of_binary = 0.5
     
     if de_noised_volume == True:
         print("SKIPPING DE NOSING")

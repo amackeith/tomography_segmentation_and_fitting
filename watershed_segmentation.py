@@ -251,14 +251,23 @@ class watershed_pipeline:
             np.save(self.fname + "_edm_blur.npy",
                     self.edm_of_ellipsiod_phase_blur)
 
-        min_p, max_p = \
-            scoreatpercentile(self.edm_of_ellipsiod_phase,
-                              (self.threshold_of_edm_percentile, 99.5))
-        self.edm_of_ellipsiod_phase[
-                    self.edm_of_ellipsiod_phase < min_p] = 0
+        if self.threshold_of_edm_percentile != -1:
+            min_p, max_p = \
+                scoreatpercentile(self.edm_of_ellipsiod_phase,
+                                  (self.threshold_of_edm_percentile, 99.5))
+            self.edm_of_ellipsiod_phase[
+                        self.edm_of_ellipsiod_phase < min_p] = 0
+
+            self.edm_of_ellipsiod_phase[
+                self.edm_of_ellipsiod_phase < 2.0] = 0
+        else:
+            # In this case the -1 is a flag which means we want to grow to the 
+            # original size of the binirized volume
+            self.edm_of_ellipsiod_phase[self.rm_holes == 0] = 0
+        # HEREERERERER
         
-        self.edm_of_ellipsiod_phase[
-            self.edm_of_ellipsiod_phase < 2.0] = 0
+        
+
         if self.debug:
             np.save(self.fname + "_edm_blur_threshold.npy",
                     self.edm_of_ellipsiod_phase)
