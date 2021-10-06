@@ -1,7 +1,7 @@
 This code was developed by Arthur MacKeith and used for this project: https://doi.org/10.1007/s10035-019-0913-7
 
 This software is for segmentation and fitting of 3D density data from
-tomographic scans of pickings of spheriods.
+tomographic scans of packings of spheriods.
 
 Start by installing python dependencies.
 
