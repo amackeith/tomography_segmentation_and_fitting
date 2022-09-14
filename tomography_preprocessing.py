@@ -80,7 +80,7 @@ class find_center:
                 done = {'d', 'done'}
                 no = {'no', 'n'}
                 remove = {'r', 'remove'}
-                sys.stdout.write("\nPress done to lock in selected centers\n" +
+                sys.stdout.write("\nEnter done and close window to lock in selected centers\n" +
                                  "remove to remove previouse circle\n" +
                                  "no to add more circles\n")
                 choice = input().lower()

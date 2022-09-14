@@ -175,8 +175,8 @@ def main():
                              "centers as 'markers'")
     parser.add_argument('-edm_p', dest='threshold_of_edm_percentile',
                         default='92.0', type=float,
-                        help="this theresholds the blurred volume and sets "
-                             "the voxels eligable to be part of the final"
+                        help="this thresholds the blurred volume and sets "
+                             "the voxels eligible to be part of the final"
                              " segments")
     parser.add_argument('-prolate', dest='prolate',
                         action='store_true',

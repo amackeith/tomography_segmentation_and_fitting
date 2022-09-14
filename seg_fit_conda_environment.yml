@@ -5,7 +5,8 @@ channels:
   - defaults
 dependencies:
   - python=3.6
-  - tomopy
   - dipy
   - nibabel
+  - tomopy
+  - ffmpeg
 
