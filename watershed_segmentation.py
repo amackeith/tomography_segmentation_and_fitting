@@ -36,6 +36,90 @@ except:
     cpp_enabled = False
 
 
+def rand_cmap(nlabels, kind='bright',
+                  first_color_black=True,
+                  last_color_black=False, verbose=False):
+        """
+        Creates a random colormap to be used together with
+         matplotlib. Useful for segmentation tasks
+        :param nlabels: Number of labels (size of colormap)
+        :param kind: 'bright' for strong colors, 'soft' for pastel colors
+        :param first_color_black: Option to use first color as black, True or False
+        :param last_color_black: Option to use last color as black, True or False
+        :param verbose: Prints the number of labels and shows the colormap. True or False
+        :return: colormap for matplotlib
+        """
+
+        # this function from  https://github.com/delestro/rand_cmap
+        from matplotlib.colors import LinearSegmentedColormap
+        import colorsys
+        import numpy as np
+
+        np.random.seed(100)
+
+        if kind not in ('bright', 'soft'):
+            print('Please choose "bright" or "soft" for kind')
+            return
+
+        if verbose:
+            print('Number of labels: ' + str(nlabels))
+
+        # Generate color map for bright colors, based on hsv
+        if kind == 'bright':
+            randHSVcolors = [(np.random.uniform(low=0.0, high=1),
+                              np.random.uniform(low=0.2, high=1),
+                              np.random.uniform(low=0.9, high=1))
+                             for i in range(nlabels)]
+
+            # Convert HSV list to RGB
+            randRGBcolors = []
+            for HSVcolor in randHSVcolors:
+                randRGBcolors.append(colorsys.hsv_to_rgb(HSVcolor[0],
+                                                         HSVcolor[1],
+                                                         HSVcolor[2]))
+
+            if first_color_black:
+                randRGBcolors[0] = [0, 0, 0]
+
+            if last_color_black:
+                randRGBcolors[-1] = [0, 0, 0]
+
+            random_colormap = LinearSegmentedColormap.from_list('new_map',
+                                                                randRGBcolors,
+                                                                N=nlabels)
+
+        # Generate soft pastel colors, by limiting the RGB spectrum
+        if kind == 'soft':
+            low = 0.6
+            high = 0.95
+            randRGBcolors = [(np.random.uniform(low=low, high=high),
+                              np.random.uniform(low=low, high=high),
+                              np.random.uniform(low=low, high=high))
+                             for i in range(nlabels)]
+
+            if first_color_black:
+                randRGBcolors[0] = [0, 0, 0]
+
+            if last_color_black:
+                randRGBcolors[-1] = [0, 0, 0]
+            random_colormap = LinearSegmentedColormap.from_list('new_map', randRGBcolors, N=nlabels)
+
+        # Display colorbar
+        if verbose:
+            from matplotlib import colors, colorbar
+            from matplotlib import pyplot as plt
+            fig, ax = plt.subplots(1, 1, figsize=(15, 0.5))
+
+            bounds = np.linspace(0, nlabels, nlabels + 1)
+            norm = colors.BoundaryNorm(bounds, nlabels)
+
+            cb = colorbar.ColorbarBase(ax, cmap=random_colormap,
+                                       norm=norm,
+                                       spacing='proportional', ticks=None,
+                                       boundaries=bounds,
+                                       format='%1i', orientation=u'horizontal')
+
+        return random_colormap
 
 
 class threshold_selector:
@@ -384,9 +468,9 @@ class watershed_pipeline:
             self.segmented_only_big_labels = \
                 better_labels(self.segmented_only_big_labels)
         
-        if self.debug:
-            
-            np.save(self.fname + "_second_grow_labels.npy",
+        #if self.debug:
+
+        np.save(self.fname + "_second_grow_labels.npy",
                     self.segmented_only_big_labels)
     
     
@@ -396,52 +480,80 @@ class watershed_pipeline:
             try: #the first one could be in two different places
                 self.original_volume = np.load(self.fname + "_preprocessed.npy")
                 cnt += 1
-            except:
+            except FileNotFoundError:
                 try:
                     self.original_volume = \
                         np.load(self.fname + "_de_noised.npy")
                     cnt += 1
-                except:
-                    pass
-                
-            self.thresh_np_image = np.load(self.fname + "_binary.npy")
-            cnt += 1
-            self.rm_holes = np.load(self.fname + "_rm_holes.npy")
-            cnt += 1
-            self.eroded_binary = np.load(self.fname + "_eroded_binary.npy")
-            cnt += 1
-            self.labeled_centers = \
-                np.load(self.fname + "_labeled_centers.npy")
-            cnt += 1
-            self.edm_of_ellipsiod_phase_blur = \
-                np.load(self.fname + "_edm_blur.npy")
-            cnt += 1
-            self.edm_of_ellipsiod_phase = \
-                np.load(self.fname + "_edm_blur_threshold.npy")
-            cnt += 1
-            self.segmented = np.load(self.fname + "_first_grow_labels.npy")
-            cnt += 1
-            self.segmented_only_big_labels = \
-                np.load(self.fname + "_second_grow_labels.npy")
+                except FileNotFoundError:
+                    nm = self.fname[:-len(str(self.threshold_of_binary))]
+                    self.original_volume = \
+                        np.load( nm + "_original.npy")
+                    cnt += 1
 
-            lbls = self.segmented_only_big_labels.copy()
-            lbls = lbls.flatten()
-            lbls = list(set(lbls))
-            self.num_lentils_found = len(lbls) - 1
-            
-            cnt += 1
-            
+            try:
+                self.thresh_np_image = np.load(self.fname + "_binary.npy")
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+            try:
+                self.rm_holes = np.load(self.fname + "_rm_holes.npy")
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+            try:
+                self.eroded_binary = np.load(self.fname + "_eroded_binary.npy")
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+            try:
+                self.labeled_centers = \
+                    np.load(self.fname + "_labeled_centers.npy")
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+            try:
+                self.edm_of_ellipsiod_phase_blur = \
+                    np.load(self.fname + "_edm_blur.npy")
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+            try:
+                self.edm_of_ellipsiod_phase = \
+                    np.load(self.fname + "_edm_blur_threshold.npy")
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+            try:
+                self.segmented = np.load(self.fname + "_first_grow_labels.npy")
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+            try:
+                self.segmented_only_big_labels = \
+                    np.load(self.fname + "_second_grow_labels.npy")
+                lbls = self.segmented_only_big_labels.copy()
+                lbls = lbls.flatten()
+                lbls = list(set(lbls))
+                self.num_lentils_found = len(lbls) - 1
+
+                cnt += 1
+            except FileNotFoundError as e:
+                print(e)
+
+        except FileNotFoundError as e:
+            print(e)
         finally:
             return cnt == 9, cnt
         
-    def display_standard_step_through(self, step_size=10):
+    def display_standard_step_through(self, step_size=1):
         
         #this is to make the color map consistent accross slices
         ones_with_color = [self.labeled_centers, self.segmented, self.segmented_only_big_labels]
         for c in ones_with_color:
             c[:, 0, 0] = 10000
             
-        colors = self.rand_cmap(10000, verbose=False)
+        colors = rand_cmap(10000, verbose=False)
         seg_cmap = colors
         
         ## this section (at the cost of 1 bad px makes the color
@@ -507,7 +619,7 @@ class watershed_pipeline:
         for c in ones_with_color:
             c[:, 0, 0] = 10000
         
-        colors = self.rand_cmap(10000, verbose=False)
+        colors = rand_cmap(10000, verbose=False)
         seg_cmap = colors
         FFMpegWriter = animation.writers['ffmpeg']
         
@@ -579,87 +691,3 @@ class watershed_pipeline:
             c[:,0,0] = 0
         
 
-    def rand_cmap(self, nlabels, kind='bright',
-                  first_color_black=True,
-                  last_color_black=False, verbose=False):
-        """
-        Creates a random colormap to be used together with
-         matplotlib. Useful for segmentation tasks
-        :param nlabels: Number of labels (size of colormap)
-        :param kind: 'bright' for strong colors, 'soft' for pastel colors
-        :param first_color_black: Option to use first color as black, True or False
-        :param last_color_black: Option to use last color as black, True or False
-        :param verbose: Prints the number of labels and shows the colormap. True or False
-        :return: colormap for matplotlib
-        """
-        
-        # this function from  https://github.com/delestro/rand_cmap
-        from matplotlib.colors import LinearSegmentedColormap
-        import colorsys
-        import numpy as np
-        
-        np.random.seed(100)
-    
-        if kind not in ('bright', 'soft'):
-            print('Please choose "bright" or "soft" for kind')
-            return
-    
-        if verbose:
-            print('Number of labels: ' + str(nlabels))
-    
-        # Generate color map for bright colors, based on hsv
-        if kind == 'bright':
-            randHSVcolors = [(np.random.uniform(low=0.0, high=1),
-                              np.random.uniform(low=0.2, high=1),
-                              np.random.uniform(low=0.9, high=1))
-                             for i in range(nlabels)]
-        
-            # Convert HSV list to RGB
-            randRGBcolors = []
-            for HSVcolor in randHSVcolors:
-                randRGBcolors.append(colorsys.hsv_to_rgb(HSVcolor[0],
-                                                         HSVcolor[1],
-                                                         HSVcolor[2]))
-        
-            if first_color_black:
-                randRGBcolors[0] = [0, 0, 0]
-        
-            if last_color_black:
-                randRGBcolors[-1] = [0, 0, 0]
-        
-            random_colormap = LinearSegmentedColormap.from_list('new_map',
-                                                                randRGBcolors,
-                                                                N=nlabels)
-    
-        # Generate soft pastel colors, by limiting the RGB spectrum
-        if kind == 'soft':
-            low = 0.6
-            high = 0.95
-            randRGBcolors = [(np.random.uniform(low=low, high=high),
-                              np.random.uniform(low=low, high=high),
-                              np.random.uniform(low=low, high=high))
-                             for i in range(nlabels)]
-        
-            if first_color_black:
-                randRGBcolors[0] = [0, 0, 0]
-        
-            if last_color_black:
-                randRGBcolors[-1] = [0, 0, 0]
-            random_colormap = LinearSegmentedColormap.from_list('new_map', randRGBcolors, N=nlabels)
-    
-        # Display colorbar
-        if verbose:
-            from matplotlib import colors, colorbar
-            from matplotlib import pyplot as plt
-            fig, ax = plt.subplots(1, 1, figsize=(15, 0.5))
-        
-            bounds = np.linspace(0, nlabels, nlabels + 1)
-            norm = colors.BoundaryNorm(bounds, nlabels)
-        
-            cb = colorbar.ColorbarBase(ax, cmap=random_colormap,
-                                       norm=norm,
-                                       spacing='proportional', ticks=None,
-                                       boundaries=bounds,
-                                       format='%1i', orientation=u'horizontal')
-    
-        return random_colormap
