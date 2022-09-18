@@ -25,7 +25,7 @@ import tomography_preprocessing
 import watershed_segmentation
 import particle_orientation
 import argparse
-
+import sys
 
 
 # takes some of the noise out of the image,
@@ -107,8 +107,8 @@ def watershed_phase(volume, fname, threshold_of_binary, gauss_filt_sigma,
     wsp.remove_small_labels()
     print("TOTAL TIME ON WATERSHED", (time.time() - s) / 60, " Minutes")
     print("seven: Create Display")
-    # wsp.display_standard_step_through(10)
-    wsp.display_movie()
+    wsp.display_standard_step_through()
+    #wsp.display_movie()
     
     return wsp.segmented_only_big_labels
 
@@ -178,13 +178,7 @@ def main():
                         help="this thresholds the blurred volume and sets "
                              "the voxels eligible to be part of the final"
                              " segments")
-    parser.add_argument('-prolate', dest='prolate',
-                        action='store_true',
-                        help="The default assumption is that the grains are"
-                             " oblate this flag changes that to prolate, this "
-                             "switches between the min and max inertial axis"
-                             " being used as the orientation vector.")
-    
+
     parser.add_argument('-de_noised_volume', dest='de_noised_volume',
                         action='store_true',
                         help="skip de noising and use fname this volume instead")
@@ -195,7 +189,20 @@ def main():
                              "noising and use fname this volume instead "
                              "(i.e. binary implies denoised) "
                              "set threshold_of_binary to 0.5 if not otherwise specified")
-    
+
+    parser.add_argument('-analyze_com_orientation', dest='analyze_com_orientation',
+                        action='store_false',
+                        help='This flag triggers the analysis of the segments for  '
+                             'center of mass and orientation of '
+                             'assuming either oblate (default) or prolate rotationally'
+                             ' symmetric particles')
+    parser.add_argument('-prolate', dest='prolate',
+                        action='store_true',
+                        help="The default assumption is that the grains are"
+                             " oblate this flag changes that to prolate, this "
+                             "switches between the min and max inertial axis"
+                             " being used as the orientation vector.")
+
     args = parser.parse_args()
     print("WARNING: the default values will not work for every particle shape\n"
           "and tomography setup they must be adjusted to each project")
@@ -213,9 +220,16 @@ def main():
         outputfolder += "/"
         if not os.path.exists(outputfolder):
             os.makedirs(outputfolder)
+
+    original_file = np.load(fname, mmap_mode='r')
+    np.save(outputfolder + fname[:-4] + "_original.npy", original_file)
+    del original_file
+    with open(outputfolder + 'commandline_args.txt', 'w') as f:
+        f.write(' '.join(sys.argv))
     
     ring_artifact_in_center = args.ring_artifact_in_center
     debug = args.debug
+    analyze_com_orientation = args.analyze_com_orientation
     oblate = not args.prolate
     de_noised_volume = args.de_noised_volume
     binary_volume = args.binary_volume
@@ -232,7 +246,8 @@ def main():
         de_noised_volume = True # binary implies denoised
         if (None == threshold_of_binary):
             threshold_of_binary = 0.5
-    
+
+
     if de_noised_volume == True:
         print("SKIPPING DE NOSING")
         de_ringed_volume = np.load(fname)
@@ -240,7 +255,7 @@ def main():
         de_ringed_volume = de_noise_and_de_ring_phase(outputfolder,
                                                       fname, ring_artifact_in_center, debug)
     
-    
+
     segmented_volume = watershed_phase(de_ringed_volume,
                                        outputfolder + fname,
                                        threshold_of_binary, gauss_filt_sigma,
@@ -248,13 +263,14 @@ def main():
                                        threshold_of_edm_percentile,
                                        min_vol_for_segment,
                                        debug)
-    
-    center_of_mass_and_orientation_from_segment(
-        outputfolder + fname,
-        segmented_volume,
-        padding=30, oblate=oblate,
-        debug=debug,
-        threshold_of_binary=str(threshold_of_binary))
+    if analyze_com_orientation:
+        center_of_mass_and_orientation_from_segment(
+            outputfolder + fname,
+            segmented_volume,
+            padding=30, oblate=oblate,
+            debug=debug,
+            threshold_of_binary=str(threshold_of_binary),
+            force_sequential=True) # TODO code conditional statements based on how much system memory is available.
 
     print("Total time: ", (time.time() - time_start) / 60, " minutes")
 
