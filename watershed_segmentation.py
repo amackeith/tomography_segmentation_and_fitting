@@ -348,10 +348,19 @@ class watershed_pipeline:
             # In this case the -1 is a flag which means we want to grow to the 
             # original size of the binirized volume
             self.edm_of_ellipsiod_phase[self.rm_holes == 0] = 0
-        # HEREERERERER
-        
-        
 
+
+        # the following is experimental, I think the "corner problem" the square shaped leaks into other cells at boundaries has to do with the order in which
+        # the values enter the minquue in a "rectangular order" such that the ones in the north west back corner get pushed
+        # in before those in the south east front corner which I suspect might be the cause of these leaks.
+        # and when there is a tie in the EDM between two it is resolved by who was pushed in first. If this is the case
+        # then a resolution might be to add noise smaller than any real distance, since the smallest distance difference
+        # is that of sqrt(n^2) - sqrt(n^2 -1) (n is largest dimension) I can safely add noise between 0 and
+        max_dim_size = max(self.edm_of_ellipsiod_phase.shape)
+        noise_scale = 0.001 * np.power(max_dim_size, -1)
+
+        randomized_noise = noise_scale * np.random.random(self.edm_of_ellipsiod_phase.shape)
+        self.edm_of_ellipsiod_phase += randomized_noise
         if self.debug:
             np.save(self.fname + "_edm_blur_threshold.npy",
                     self.edm_of_ellipsiod_phase)
