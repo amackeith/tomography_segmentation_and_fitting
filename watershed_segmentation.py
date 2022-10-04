@@ -357,7 +357,7 @@ class watershed_pipeline:
         # then a resolution might be to add noise smaller than any real distance, since the smallest distance difference
         # is that of sqrt(n^2) - sqrt(n^2 -1) (n is largest dimension) I can safely add noise between 0 and
         max_dim_size = max(self.edm_of_ellipsiod_phase.shape)
-        noise_scale = 0.001 * np.power(max_dim_size, -1)
+        noise_scale = 0.001 * np.power(float(max_dim_size), -1)
 
         randomized_noise = noise_scale * np.random.random(self.edm_of_ellipsiod_phase.shape)
         self.edm_of_ellipsiod_phase += randomized_noise
