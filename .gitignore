@@ -1,3 +1,13 @@
+# editing folders
 *.idea/
+# runtime generated files and build generated files
 *__pycache__/
+watershedtools_cpp/_watershedtools_cpp.so
+watershedtools_cpp/watershedtools_cpp.o
+watershedtools_cpp/watershedtools_cpp.py
+watershedtools_cpp/watershedtools_cpp_wrap.cpp
+watershedtools_cpp/watershedtools_cpp_wrap.o
+
+# common example dataset
 shearworn45lentil20190110*
+
