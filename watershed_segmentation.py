@@ -38,7 +38,7 @@ except:
 
 def rand_cmap(nlabels, kind='bright',
                   first_color_black=True,
-                  last_color_black=False, verbose=False):
+                  last_color_black=False, verbose=False, random_seed=100):
         """
         Creates a random colormap to be used together with
          matplotlib. Useful for segmentation tasks
@@ -55,7 +55,7 @@ def rand_cmap(nlabels, kind='bright',
         import colorsys
         import numpy as np
 
-        np.random.seed(100)
+        np.random.seed(random_seed)
 
         if kind not in ('bright', 'soft'):
             print('Please choose "bright" or "soft" for kind')

@@ -107,8 +107,8 @@ def watershed_phase(volume, fname, threshold_of_binary, gauss_filt_sigma,
     wsp.remove_small_labels()
     print("TOTAL TIME ON WATERSHED", (time.time() - s) / 60, " Minutes")
     print("seven: Create Display")
-    wsp.display_standard_step_through()
-    #wsp.display_movie()
+    #wsp.display_standard_step_through()
+    wsp.display_movie()
     
     return wsp.segmented_only_big_labels
 
@@ -151,7 +151,7 @@ def main():
     parser.add_argument('-v',
                         dest='min_vol_for_segment',
                         default=1000,
-                        type=int,
+                        type=float,
                         help='WARNING: this will be very dependent on shape : '
                              'Minimum size for a particle, all particles '
                              'less than this will be removed '
@@ -191,7 +191,7 @@ def main():
                              "set threshold_of_binary to 0.5 if not otherwise specified")
 
     parser.add_argument('-analyze_com_orientation', dest='analyze_com_orientation',
-                        action='store_false',
+                        action='store_true',
                         help='This flag triggers the analysis of the segments for  '
                              'center of mass and orientation of '
                              'assuming either oblate (default) or prolate rotationally'
@@ -214,7 +214,7 @@ def main():
     
     fname = args.fname
     gauss_filt_sigma = args.gauss_filt_sigma
-    min_vol_for_segment = args.min_vol_for_segment
+    min_vol_for_segment = int(args.min_vol_for_segment)
     outputfolder = os.path.expanduser(args.outputfolder)
     if outputfolder[-1] != "/":
         outputfolder += "/"
@@ -263,6 +263,7 @@ def main():
                                        threshold_of_edm_percentile,
                                        min_vol_for_segment,
                                        debug)
+
     if analyze_com_orientation:
         center_of_mass_and_orientation_from_segment(
             outputfolder + fname,

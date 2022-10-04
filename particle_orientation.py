@@ -13,6 +13,7 @@ import numpy as np
 import scipy.ndimage as ndi
 
 
+
 cpp_enabled = True
 try:
     import watershedtools_cpp.watershedtools_cpp as watershedtools_cpp
@@ -157,6 +158,7 @@ def get_loc_and_angle(full_fitt, lbl_lst, que, core_num,
         if debug:
             print("core_num", core_num, "number", cnt,
                   "of", num, "mask vol", mask_vol)
+
         cnt = cnt + 1
     
     que.put(com_angle_list)
@@ -193,6 +195,7 @@ class orientations_from_moment_of_inertia:
         self.lbls = self.lbls[1:]  # get rid of 0 label
     
     def sequential_run(self):
+        print("THIS IS A SEQUENTIAL RUN")
         results = []
         q = Queue()
         get_loc_and_angle(self.volume, self.lbls, q, 0, self.padding,
@@ -200,7 +203,7 @@ class orientations_from_moment_of_inertia:
         
         results.extend(q.get(True))
         
-        results = np.array(results)
+        results = np.array(results, dtype=object)
         
         # see explination of positions_orientations.npy in processing()
         np.save(self.fname + self.threshold_of_binary +
